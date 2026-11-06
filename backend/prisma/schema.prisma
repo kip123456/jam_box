@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum JobStatus {
+  pending
+  running
+  success
+  failed
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  type        String
+  payload     Json?
+  status      JobStatus @default(pending)
+  retryCount  Int       @default(0)
+  maxRetries  Int       @default(3)
+  result      Json?
+  error       String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+}

@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
 
+set -m
+
 cleanup() {
+  trap - SIGINT SIGTERM EXIT
   echo ""
   echo "==> Stopping all services..."
-  kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
-  wait $BACKEND_PID $FRONTEND_PID 2>/dev/null
+  [ -n "${BACKEND_PID:-}" ] && kill -- -"$BACKEND_PID" 2>/dev/null
+  [ -n "${FRONTEND_PID:-}" ] && kill -- -"$FRONTEND_PID" 2>/dev/null
+  wait 2>/dev/null
   echo "==> All stopped."
   exit 0
 }
 
-trap cleanup SIGINT SIGTERM
+trap cleanup SIGINT SIGTERM EXIT
 
 echo "==> Starting backend dev server..."
-(cd backend && npm run dev) &
+(cd backend && npm run dev 2>&1 | sed -u 's/^/[backend] /') &
 BACKEND_PID=$!
 
 echo "==> Starting frontend dev server..."
-(cd frontend && npm run dev) &
+(cd frontend && npm run dev 2>&1 | sed -u 's/^/[frontend] /') &
 FRONTEND_PID=$!
 
 echo ""
