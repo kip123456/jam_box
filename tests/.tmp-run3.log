@@ -1,0 +1,1156 @@
+﻿
+> jam-box@0.1.0 test
+> node tests/run-tests.mjs
+
+[test] 清理上次测试产物 ...
+[test] 迁移测试数据库 backend/prisma/test.db ...
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+
+[test] 运行 vitest ...
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90mC:/Users/10031/code/jam_box[39m
+
+node.exe : [90mstderr[2m | tests/api/ai-llm.test.ts
+所在位置 C:\Program Files\nodejs\npm.ps1:29 字符: 3
++   & $NODE_EXE $NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([90mstderr[2m.../ai-llm.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/api/ai-llm.test.ts[2m > [22mPOST /api/v1/ai/ask LLM 兜底[2m > [22m知识库未命中时走 LLM：source=llm 且透传问题[33m 1378[2mms[22m[39m
+ [32m✓[39m tests/api/ai-llm.test.ts[2m > [22mPOST /api/v1/ai/ask LLM 兜底[2m > [22mLLM 调用失败：返回 503 通用文案，不泄露上游错误细节[33m 1153[2mms[22m[39m
+ [32m✓[39m tests/api/ai-llm.test.ts[2m > [22mai-compose 任务全链路（提交 → 执行 → 轮询）[2m > [22mLLM 返回合法轨道：job 最终 success，result.tracks 结构完整[33m 1237[2mms[22m[39m
+ [32m✓[39m tests/api/ai-llm.test.ts[2m > [22mai-compose 任务全链路（提交 → 执行 → 轮询）[2m > [22mLLM 返回 pitch=150：业务校验拦截，job 最终 failed 且错误不含原始输出[33m 1286[2mms[22m[39m
+ [32m✓[39m tests/api/ai-llm.test.ts[2m > [22mai-fix 任务全链路（提交 → 执行 → 轮询）[2m > [22mLLM 修复成功：job success，修复结果保留轨道与音符 id[33m 1271[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms 创建房间[2m > [22m创建公开房间：创建者为 owner，房间号为 6 位数字[33m 1207[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms 创建房间[2m > [22m创建私有房间：密码以 bcrypt 哈希落库且响应不含 passwordHash[33m 1496[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms 创建房间[2m > [22m[2m创建房间名为空返回 400 且消息与 spec
+ 一致
+[22m[39m[error] POST /api/v1/rooms ValidationError: 房间名长度必须在 1-50 字符之间
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:32:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:48:5)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms 创建房间[2m > [22m创建房间名为空返回 400 且消息与 spec 一致[33m 1036[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms 创建房间[2m > [22m[2m创建房间名超过 50 字符返回 400（边界）
+[22m[39m[error] POST /api/v1/rooms ValidationError: 房间名长度必须在 1-50 字符之间
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:32:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:48:5)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms 创建房间[2m > [22m创建房间名超过 50 字符返回 400（边界）[33m 1035[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms 创建房间[2m > [22m[2m未登录创建房间返回 401 未登录
+[22m[39m[error] POST /api/v1/rooms AuthError: 未登录
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:38:10)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms 创建房间[2m > [22m未登录创建房间返回 401 未登录[32m 32[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms 创建房间[2m > [22m[2m私有房间缺少密码返回 400
+[22m[39m[error] POST /api/v1/rooms ValidationError: 私有房间密码长度必须在 8-32 位之间
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:32:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:48:5)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms 创建房间[2m > [22m私有房间缺少密码返回 400[33m 1042[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mGET /api/v1/rooms 列出公开房间[2m > [22m列出公开房间：仅 active 公开房间并按创建时间倒序[33m 2535[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mGET /api/v1/rooms 列出公开房间[2m > [22m没有活跃公开房间时返回空数组[32m 50[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mGET /api/v1/rooms 列出公开房间[2m > [22m列出公开房间最多返回 20 条（边界）[33m 1538[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mGET /api/v1/rooms/:roomId 房间详情[2m > [22m房间详情：成员返回 isMember=true 与 role[33m 1040[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mGET /api/v1/rooms/:roomId 房间详情[2m > [22m私有房间详情对非成员不返回 passwordHash[33m 2600[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mGET /api/v1/rooms/:roomId 房间详情[2m > [22m[2m房间不存在返回 404 房间不存
+在
+[22m[39m[error] GET /api/v1/rooms/not-exists BusinessError: 房间不存在
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:95:15
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mGET /api/v1/rooms/:roomId 房间详情[2m > [22m房间不存在返回 404 房间不存在[32m 60[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mGET /api/v1/rooms/:roomId 房间详情[2m > [22m已结束房间仍可查看详情且 status=ended[33m 1150[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m加入公开房间成功并出现在成员列表[33m 2092[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m私有房间密码正确可加入[33m 3048[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m[2m私有房间密码错误返回
+ 401 房间密码错误
+[22m[39m[error] POST /api/v1/rooms/cmw4p59520043kius13cc8oke/join BusinessError: 房间密码错误
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:154:17
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m私有房间密码错误返回 401 房间密码错误[33m 2977[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m[2m私有房间未提供密码返
+回 401 房间密码错误（边界）
+[22m[39m[error] POST /api/v1/rooms/cmw4p5bhj0049kiuse8lvifvh/join BusinessError: 房间密码错误
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:154:17
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m私有房间未提供密码返回 401 房间密码错误（边界）[33m 2569[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m[2m重复加入返回 409
+ 你已是该房间成员
+[22m[39m[error] POST /api/v1/rooms/cmw4p5cb1004ekiusxi4ladge/join BusinessError: 你已是该房间成员
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:143:15
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m重复加入返回 409 你已是该房间成员[33m 1064[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m[2m加入已锁定房间返回 
+403 房间已锁定，无法加入
+[22m[39m[error] POST /api/v1/rooms/cmw4p5dvb004kkiushhgf6huc/join BusinessError: 房间已锁定，无法加入
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:136:15
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m加入已锁定房间返回 403 房间已锁定，无法加入[33m 2052[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m[2m加入已结束房间返回 
+403 合奏已结束
+[22m[39m[error] POST /api/v1/rooms/cmw4p5fg1004qkiushgcf67ho/join BusinessError: 合奏已结束
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:133:15
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m加入已结束房间返回 403 合奏已结束[33m 2035[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m按房间号加入公开房间成功（边界）[33m 2011[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m[2m加入不存在的房间返回
+ 404 房间不存在
+[22m[39m[error] POST /api/v1/rooms/not-exists/join BusinessError: 房间不存在
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:130:15
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m加入不存在的房间返回 404 房间不存在[33m 1020[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/join 加入房间[2m > [22m密码明文不出现在错误日志中[33m 2878[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mDELETE /api/v1/rooms/:roomId/members/:userId 房主踢人[2m > [22m房主踢普通成员后成员列表更新[33m 2041[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mDELETE /api/v1/rooms/:roomId/members/:userId 房主踢人[2m > [22m
+[2m房主踢自己返回 400 不能踢房主
+[22m[39m[error] DELETE /api/v1/rooms/cmw4p5n4c005jkiusaxblexhx/members/cmw4p5m0k005gkiusbh7852dh BusinessError: 不能踢房主
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:192:15
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at C:/Users/10031/code/jam_box/backend/src/middleware/room.ts:45:7
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mDELETE /api/v1/rooms/:roomId/members/:userId 房主踢人[2m > [22m房主踢自己返回 400 不能踢房主[33m 2003[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mDELETE /api/v1/rooms/:roomId/members/:userId 房主踢人[2m > [22m
+[2m普通成员尝试踢人返回 403 无权限
+[22m[39m[error] DELETE /api/v1/rooms/cmw4p5onw005rkiusty5scvy9/members/cmw4p5oae005pkiusdeeau1kd BusinessError: 无权限
+    at C:/Users/10031/code/jam_box/backend/src/middleware/room.ts:39:14
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mDELETE /api/v1/rooms/:roomId/members/:userId 房主踢人[2m > [22m普通成员尝试踢人返回 403 无权限[33m 1999[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mDELETE /api/v1/rooms/:roomId/members/:userId 房主踢人[2m > [22m
+[2m踢不在房间的用户返回 404 该成员不在房间中
+[22m[39m[error] DELETE /api/v1/rooms/cmw4p5q8c005zkius5sc3wvkj/members/cmw4p5qmm0064kius2hfx1779 BusinessError: 该成员不在
+房间中
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:199:15
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mDELETE /api/v1/rooms/:roomId/members/:userId 房主踢人[2m > [22m踢不在房间的用户返回 404 该成员不在房间中[33m 2980[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mDELETE /api/v1/rooms/:roomId/members/:userId 房主踢人[2m > [22m
+[2m非成员调用踢人返回 403 不是房间成员
+[22m[39m[error] DELETE /api/v1/rooms/cmw4p5skg0068kiusgf4n9mkf/members/cmw4p5syz006dkiustlb2h9rw BusinessError: 不是房间成
+员
+    at C:/Users/10031/code/jam_box/backend/src/middleware/room.ts:34:14
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mDELETE /api/v1/rooms/:roomId/members/:userId 房主踢人[2m > [22m非成员调用踢人返回 403 不是房间成员[33m 3030[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/lock 加锁[2m > [22m房主加锁成功返回 status=locked[33m 1064[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/lock 加锁[2m > [22m[2m非房主尝试加锁返回 40
+3 无权限
+[22m[39m[error] POST /api/v1/rooms/cmw4p5vow006mkius0u7g8ovm/lock BusinessError: 无权限
+    at C:/Users/10031/code/jam_box/backend/src/middleware/room.ts:39:14
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/lock 加锁[2m > [22m非房主尝试加锁返回 403 无权限[33m 2035[2mms[22m[39m
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/end 结束合奏[2m > [22m房主结束合奏返回 status=ended[33m 1087[2mms[22m[39m
+[90mstderr[2m | tests/api/rooms.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/end 结束合奏[2m > [22m[2m已结束房间再次结束返回
+ 400 房间已结束
+[22m[39m[error] POST /api/v1/rooms/cmw4p5xcx006ykiusp5yxnlly/end BusinessError: 房间已结束
+    at C:/Users/10031/code/jam_box/backend/src/routes/rooms.ts:248:15
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at C:/Users/10031/code/jam_box/backend/src/middleware/room.ts:45:7
+
+ [32m✓[39m tests/api/rooms.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/end 结束合奏[2m > [22m已结束房间再次结束返回 400 房间已结束[33m 1061[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m创建四种乐器轨道：position 从 0 递增，默认 solo/mute 为 false、颜色为 #3b82f6[33m 1369[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m[2m乐器类型非法返
+回 400 且消息与 spec 一致
+[22m[39m[error] POST /api/v1/rooms/cmw4p627w000fkicwxdxaawtu/tracks ValidationError: 不支持的乐器类型
+    at C:/Users/10031/code/jam_box/backend/src/routes/tracks.ts:22:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m乐器类型非法返回 400 且消息与 spec 一致[33m 1146[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m[2m轨道名为空 /
+ 超过 50 字符返回 400（边界）
+[22m[39m[error] POST /api/v1/rooms/cmw4p639b000kkicw0bydlh3i/tracks ValidationError: 轨道名长度必须在 1-50 字符之间
+    at C:/Users/10031/code/jam_box/backend/src/routes/tracks.ts:22:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m[2m轨道名为空 /
+ 超过 50 字符返回 400（边界）
+[22m[39m[error] POST /api/v1/rooms/cmw4p639b000kkicw0bydlh3i/tracks ValidationError: 轨道名长度必须在 1-50 字符之间
+    at C:/Users/10031/code/jam_box/backend/src/routes/tracks.ts:22:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m轨道名为空 / 超过 50 字符返回 400（边界）[33m 1382[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m[2m颜色非十六进制
+返回 400，合法颜色可写入
+[22m[39m[error] POST /api/v1/rooms/cmw4p64ih000rkicw88hienyk/tracks ValidationError: 颜色必须是十六进制格式（如 #3b82f6）
+    at C:/Users/10031/code/jam_box/backend/src/routes/tracks.ts:22:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m颜色非十六进制返回 400，合法颜色可写入[33m 1601[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m[2m非房间成员创建
+返回 403「不是房间成员」，未登录返回 401
+[22m[39m[error] POST /api/v1/rooms/cmw4p66h8000zkicwo1garkp1/tracks BusinessError: 不是房间成员
+    at C:/Users/10031/code/jam_box/backend/src/middleware/room.ts:34:14
+
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m[2m非房间成员创建
+返回 403「不是房间成员」，未登录返回 401
+[22m[39m[error] POST /api/v1/rooms/cmw4p66h8000zkicwo1garkp1/tracks AuthError: 未登录
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:38:10)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at trim_prefix (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:646:15
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m非房间成员创建返回 403「不是房间成员」，未登录返回 401[33m 2529[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m[2m房间不存在返回
+ 404「房间不存在」
+[22m[39m[error] POST /api/v1/rooms/not_exist_room/tracks BusinessError: 房间不存在
+    at C:/Users/10031/code/jam_box/backend/src/middleware/room.ts:25:14
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mPOST /api/v1/rooms/:roomId/tracks 创建轨道[2m > [22m房间不存在返回 404「房间不存在」[33m 1226[2mms[22m[39m
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mGET /api/v1/rooms/:roomId/tracks 列表[2m > [22m按 position 升序返回，且每个轨道包含按开始时间升序的音符[33m 1373[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mGET /api/v1/rooms/:roomId/tracks 列表[2m > [22m[2m非房间成员返回 40
+3
+[22m[39m[error] GET /api/v1/rooms/cmw4p6aec001jkicwmkgxzt25/tracks BusinessError: 不是房间成员
+    at C:/Users/10031/code/jam_box/backend/src/middleware/room.ts:34:14
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mGET /api/v1/rooms/:roomId/tracks 列表[2m > [22m非房间成员返回 403[33m 2466[2mms[22m[39m
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mGET /api/v1/tracks/:trackId 单轨道[2m > [22m成员可获取轨道及其音符[33m 1358[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mGET /api/v1/tracks/:trackId 单轨道[2m > [22m[2m轨道不存在返回 404，非成
+员返回 403
+[22m[39m[error] GET /api/v1/tracks/not_exist BusinessError: 轨道不存在
+    at requireTrackAccess (C:/Users/10031/code/jam_box/backend/src/middleware/roomMember.ts:35:12)
+
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mGET /api/v1/tracks/:trackId 单轨道[2m > [22m[2m轨道不存在返回 404，非成
+员返回 403
+[22m[39m[error] GET /api/v1/tracks/cmw4p6dew0022kicwq49kpf9w BusinessError: 不是房间成员
+    at requireTrackAccess (C:/Users/10031/code/jam_box/backend/src/middleware/roomMember.ts:50:12)
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mGET /api/v1/tracks/:trackId 单轨道[2m > [22m轨道不存在返回 404，非成员返回 403[33m 2566[2mms[22m[39m
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mPUT /api/v1/tracks/:trackId 更新轨道[2m > [22m可更新 name/solo/mute/color/position[33m 1178[2mms[22m[39m
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mPUT /api/v1/tracks/:trackId 更新轨道[2m > [22m不可修改 instrumentType 与 roomId：传入被忽略[33m 1125[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mPUT /api/v1/tracks/:trackId 更新轨道[2m > [22m[2m颜色非法 / positi
+on 为负返回 400
+[22m[39m[error] PUT /api/v1/tracks/cmw4p6g21002nkicw2k7jvkm4 ValidationError: 颜色必须是十六进制格式（如 #3b82f6）
+    at C:/Users/10031/code/jam_box/backend/src/routes/tracks.ts:92:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at param (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mPUT /api/v1/tracks/:trackId 更新轨道[2m > [22m[2m颜色非法 / positi
+on 为负返回 400
+[22m[39m[error] PUT /api/v1/tracks/cmw4p6g21002nkicw2k7jvkm4 ValidationError: position 不能为负数
+    at C:/Users/10031/code/jam_box/backend/src/routes/tracks.ts:92:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at param (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mPUT /api/v1/tracks/:trackId 更新轨道[2m > [22m颜色非法 / position 为负返回 400[33m 1110[2mms[22m[39m
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mDELETE /api/v1/tracks/:trackId 删除轨道[2m > [22m删除轨道时级联删除其音符[33m 1084[2mms[22m[39m
+[90mstderr[2m | tests/api/tracks.test.ts[2m > [22m[2mDELETE /api/v1/tracks/:trackId 删除轨道[2m > [22m[2m非成员删除返回 40
+3
+[22m[39m[error] DELETE /api/v1/tracks/cmw4p6ima0034kicwwkm6bfpd BusinessError: 不是房间成员
+    at requireTrackAccess (C:/Users/10031/code/jam_box/backend/src/middleware/roomMember.ts:50:12)
+
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mDELETE /api/v1/tracks/:trackId 删除轨道[2m > [22m非成员删除返回 403[33m 2233[2mms[22m[39m
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mGET /api/v1/rooms/:roomId 房间详情包含轨道[2m > [22m成员获取详情时返回 tracks（含音符）[33m 1215[2mms[22m[39m
+ [32m✓[39m tests/api/tracks.test.ts[2m > [22mGET /api/v1/rooms/:roomId 房间详情包含轨道[2m > [22m公开房间允许非成员只读轨道；私有房间非成员 tracks 为空[33m 2808[2mms[22m[39m
+[90mstderr[2m | tests/api/ai.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/compose 提交智能编曲任务[2m > [22m未登录提交返回 401 未登录[32m 227[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/compose 提交智能编曲任务[2m > [22m缺少 instruction 返回 400 且消息匹配[33m 1154[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/compose 提交智能编曲任务[2m > [22minstruction 超过 500 字符返回 400（边界）[33m 1143[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/compose 提交智能编曲任务[2m > [22m房间不存在返回 404 房间不存在[33m 1166[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/compose 提交智能编曲任务[2m > [22m非房间成员提交返回 403 不是房间成员[33m 2481[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/compose 提交智能编曲任务[2m > [22m空房间提交成功：job 落库，payload 含默认 bpm=120 与空轨道上下文[33m 1266[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/compose 提交智能编曲任务[2m > [22m已有轨道时 existingTracksContext 汇总轨道名与乐器类型，bpm 透传[33m 1361[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mGET /api/v1/ai/compose/:jobId 轮询编曲任务[2m > [22m未登录轮询返回 401[32m 111[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mGET /api/v1/ai/compose/:jobId 轮询编曲任务[2m > [22m任务不存在返回 404 任务不存在[33m 1179[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mGET /api/v1/ai/compose/:jobId 轮询编曲任务[2m > [22m查询已提交任务返回完整状态结构[33m 1250[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/ask 乐理问答[2m > [22m未登录提问返回 401[32m 89[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/ask 乐理问答[2m > [22m空问题返回 400[33m 1144[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/ask 乐理问答[2m > [22m命中知识库：Cmaj7 是什么 → source=knowledge-base 且答案含组成音[33m 1117[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/ask 乐理问答[2m > [22m知识库未命中且未配置 LLM：返回 503 友好提示[33m 1301[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/check 规则检查[2m > [22m未登录返回 401[32m 53[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/check 规则检查[2m > [22mtracks 为空数组返回 400（边界）[33m 1219[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/check 规则检查[2m > [22m合法轨道返回空 issues[33m 1768[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/check 规则检查[2m > [22mpitch=150 返回 pitch-out-of-range 问题[33m 1844[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/check 规则检查[2m > [22mpitch=30 返回 pitch-out-of-register 问题[33m 1124[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/check 规则检查[2m > [22mdurationTicks=240 返回 duration-too-short 问题[33m 1089[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/check 规则检查[2m > [22mvelocity=0 返回 velocity-out-of-range 问题[33m 1108[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/check 规则检查[2m > [22m同轨道音符时间重叠返回 notes-overlap 问题[33m 1142[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/fix 提交自动修复任务[2m > [22m未登录提交返回 401[32m 32[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/fix 提交自动修复任务[2m > [22missues 为空数组返回 400（边界）[33m 1132[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/fix 提交自动修复任务[2m > [22m房间不存在返回 404[33m 1146[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/fix 提交自动修复任务[2m > [22m非房间成员提交返回 403[33m 2540[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mPOST /api/v1/ai/fix 提交自动修复任务[2m > [22m提交成功：job 落库且结构化 issues 展开为文本行[33m 1415[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mGET /api/v1/ai/fix/:jobId 轮询修复任务[2m > [22m未登录轮询返回 401[32m 78[2mms[22m[39m
+ [32m✓[39m tests/api/ai.test.ts[2m > [22mGET /api/v1/ai/fix/:jobId 轮询修复任务[2m > [22m任务不存在返回 404 任务不存在[33m 1268[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/register[2m > [22m注册成功：返回用户信息、密码以 bcrypt cost 12 哈希落库且不回传哈希[33m 1224[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/register[2m > [22m[2m重复用户名返回 409 且消息与 spec
+ 一致
+[22m[39m[error] POST /api/v1/auth/register BusinessError: 用户名已被占用
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:42:15
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/register[2m > [22m重复用户名返回 409 且消息与 spec 一致[33m 1419[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/register[2m > [22m[2m邮箱格式不正确返回 400
+[22m[39m[error] POST /api/v1/auth/register ValidationError: 邮箱格式不正确
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:23:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/register[2m > [22m[2m密码不含数字返回 400 且消息与 spe
+c 一致
+[22m[39m[error] POST /api/v1/auth/register ValidationError: 密码至少 8 位且需包含字母和数字
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:23:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/register[2m > [22m邮箱格式不正确返回 400[32m 63[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/register[2m > [22m密码不含数字返回 400 且消息与 spec 一致[32m 36[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/register[2m > [22m[2m密码少于 8 位返回 400（边界）
+[22m[39m[error] POST /api/v1/auth/register ValidationError: 密码至少 8 位且需包含字母和数字
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:23:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/register[2m > [22m[2m用户名含非法字符返回 400
+[22m[39m[error] POST /api/v1/auth/register ValidationError: 用户名需为 3-32 位字母、数字或下划线
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:23:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/register[2m > [22m[2m用户名为 2 位返回 400（长度下边界）
+[22m[39m[error] POST /api/v1/auth/register ValidationError: 用户名需为 3-32 位字母、数字或下划线
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:23:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/register[2m > [22m密码少于 8 位返回 400（边界）[32m 34[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/register[2m > [22m用户名含非法字符返回 400[32m 34[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/register[2m > [22m用户名为 2 位返回 400（长度下边界）[32m 35[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/register[2m > [22m邮箱可省略，落库为 null（边界）[33m 723[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/login[2m > [22m登录成功返回双令牌与用户信息，access 15min / refresh 7d[33m 1489[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/login[2m > [22mJWT payload 仅含 sub/type/iat/exp，不泄露 username 或 email[33m 1298[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/login[2m > [22m[2m用户名不存在返回 401 且不区分具体字段
+[22m[39m[error] POST /api/v1/auth/login AuthError: 用户名或密码错误
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:63:13
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/login[2m > [22m用户名不存在返回 401 且不区分具体字段[33m 651[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/login[2m > [22m[2m密码错误返回 401 且消息与用户名不存在一致
+[22m[39m[error] POST /api/v1/auth/login AuthError: 用户名或密码错误
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:68:13
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/login[2m > [22m密码错误返回 401 且消息与用户名不存在一致[33m 1205[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/login[2m > [22m[2m缺少密码返回 400（边界）
+[22m[39m[error] POST /api/v1/auth/login ValidationError: 密码不能为空
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:56:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/login[2m > [22m缺少密码返回 400（边界）[33m 609[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mGET /api/v1/auth/me[2m > [22m携带有效 access token 返回当前用户且不含 passwordHash[33m 1236[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mGET /api/v1/auth/me[2m > [22m[2m缺少 Authorization 返回 401 未登录
+[22m[39m[error] GET /api/v1/auth/me AuthError: 未登录
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:38:10)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mGET /api/v1/auth/me[2m > [22m缺少 Authorization 返回 401 未登录[33m 1111[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mGET /api/v1/auth/me[2m > [22m[2mAuthorization 格式错误返回 401 未登录
+（边界）
+[22m[39m[error] GET /api/v1/auth/me AuthError: 未登录
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:38:10)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mGET /api/v1/auth/me[2m > [22mAuthorization 格式错误返回 401 未登录（边界）[33m 1058[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mGET /api/v1/auth/me[2m > [22m[2m签名无效的 access token 返回 401 令牌
+无效
+[22m[39m[error] GET /api/v1/auth/me AuthError: 令牌无效
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:53:12)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mGET /api/v1/auth/me[2m > [22m签名无效的 access token 返回 401 令牌无效[33m 1063[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mGET /api/v1/auth/me[2m > [22m[2m过期的 access token 返回 401 令牌已过
+期
+[22m[39m[error] GET /api/v1/auth/me AuthError: 令牌已过期
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:51:12)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mGET /api/v1/auth/me[2m > [22m过期的 access token 返回 401 令牌已过期[33m 1080[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mGET /api/v1/auth/me[2m > [22m[2m用 refresh token 访问受保护接口返回 40
+1 令牌无效（令牌类型隔离）
+[22m[39m[error] GET /api/v1/auth/me AuthError: 令牌无效
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:53:12)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mGET /api/v1/auth/me[2m > [22m用 refresh token 访问受保护接口返回 401 令牌无效（令牌类型隔离）[33m 1587[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mGET /api/v1/auth/me[2m > [22m[2m合法签名但用户已不存在返回 401 未登录（依赖数据缺失
+）
+[22m[39m[error] GET /api/v1/auth/me AuthError: 未登录
+    at C:/Users/10031/code/jam_box/backend/src/routes/auth.ts:100:15
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mGET /api/v1/auth/me[2m > [22m合法签名但用户已不存在返回 401 未登录（依赖数据缺失）[33m 1188[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/refresh[2m > [22m有效 refresh token 换发新双令牌，新 access token 可访问 me[33m 1173[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/refresh[2m > [22m也支持通过 Authorization header 提交 refresh token（边界）[33m 1161[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/refresh[2m > [22m[2m用 access token 调用 refr
+esh 返回 401 令牌无效
+[22m[39m[error] POST /api/v1/auth/refresh AuthError: 令牌无效
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:53:12)
+    at authenticateRefreshToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:99:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/refresh[2m > [22m用 access token 调用 refresh 返回 401 令牌无效[33m 1184[2mms[22m[39m
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/refresh[2m > [22m旧 access token 在有效期内仍可访问 me（无状态 JWT，不做黑名单）[33m 1161[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/refresh[2m > [22m[2m签名无效的 refresh token 返回
+ 401 令牌无效
+[22m[39m[error] POST /api/v1/auth/refresh AuthError: 令牌无效
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:53:12)
+    at authenticateRefreshToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:99:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/refresh[2m > [22m签名无效的 refresh token 返回 401 令牌无效[33m 1073[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/refresh[2m > [22m[2m过期的 refresh token 返回 4
+01 令牌已过期
+[22m[39m[error] POST /api/v1/auth/refresh AuthError: 令牌已过期
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:51:12)
+    at authenticateRefreshToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:99:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/refresh[2m > [22m过期的 refresh token 返回 401 令牌已过期[33m 1050[2mms[22m[39m
+[90mstderr[2m | tests/api/auth.test.ts[2m > [22m[2mPOST /api/v1/auth/refresh[2m > [22m[2m缺少 refreshToken 返回 401
+ 未登录（边界）
+[22m[39m[error] POST /api/v1/auth/refresh AuthError: 未登录
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:38:10)
+    at authenticateRefreshToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:99:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+
+ [32m✓[39m tests/api/auth.test.ts[2m > [22mPOST /api/v1/auth/refresh[2m > [22m缺少 refreshToken 返回 401 未登录（边界）[33m 1186[2mms[22m[39m
+[90mstderr[2m | tests/api/notes.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/api/notes.test.ts[2m > [22mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m创建音符：velocity 默认 100，响应字段完整[33m 1569[2mms[22m[39m
+ [32m✓[39m tests/api/notes.test.ts[2m > [22mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m边界值 pitch 0 / 127、durationTicks 480 合法[33m 1404[2mms[22m[39m
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m[2mpitch 超
+出 0-127 返回 400 且消息与 spec 一致
+[22m[39m[error] POST /api/v1/tracks/cmw4p8b7a000qki40npzf2ar8/notes ValidationError: 音高必须在 0-127 之间
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:45:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m[2mpitch 超
+出 0-127 返回 400 且消息与 spec 一致
+[22m[39m[error] POST /api/v1/tracks/cmw4p8b7a000qki40npzf2ar8/notes ValidationError: 音高必须在 0-127 之间
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:45:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/notes.test.ts[2m > [22mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22mpitch 超出 0-127 返回 400 且消息与 spec 一致[33m 1342[2mms[22m[39m
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m[2mstartTi
+meTicks 为负、durationTicks 小于 480、velocity 超界均返回 400
+[22m[39m[error] POST /api/v1/tracks/cmw4p8ccm000xki4010507ulu/notes ValidationError: 开始时间必须 ≥ 0
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:45:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m[2mstartTi
+meTicks 为负、durationTicks 小于 480、velocity 超界均返回 400
+[22m[39m[error] POST /api/v1/tracks/cmw4p8ccm000xki4010507ulu/notes ValidationError: 音符时长至少 480 ticks
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:45:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m[2mstartTi
+meTicks 为负、durationTicks 小于 480、velocity 超界均返回 400
+[22m[39m[error] POST /api/v1/tracks/cmw4p8ccm000xki4010507ulu/notes ValidationError: 力度必须在 0-127 之间
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:45:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/notes.test.ts[2m > [22mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22mstartTimeTicks 为负、durationTicks 小于 480、velocity 超界均返回 400[33m 1500[2mms[22m[39m
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m[2m非成员创建返回
+ 403，未登录返回 401，轨道不存在返回 404
+[22m[39m[error] POST /api/v1/tracks/cmw4p8dcp0014ki402agqeqdg/notes BusinessError: 不是房间成员
+    at requireTrackAccess (C:/Users/10031/code/jam_box/backend/src/middleware/roomMember.ts:50:12)
+
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m[2m非成员创建返回
+ 403，未登录返回 401，轨道不存在返回 404
+[22m[39m[error] POST /api/v1/tracks/cmw4p8dcp0014ki402agqeqdg/notes AuthError: 未登录
+    at authenticate (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:38:10)
+    at authenticateAccessToken (C:/Users/10031/code/jam_box/backend/src/middleware/auth.ts:66:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at trim_prefix (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:286:9
+    at param (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:646:15
+
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m[2m非成员创建返回
+ 403，未登录返回 401，轨道不存在返回 404
+[22m[39m[error] POST /api/v1/tracks/not_exist/notes BusinessError: 轨道不存在
+    at requireTrackAccess (C:/Users/10031/code/jam_box/backend/src/middleware/roomMember.ts:35:12)
+
+ [32m✓[39m tests/api/notes.test.ts[2m > [22mPOST /api/v1/tracks/:trackId/notes 创建音符[2m > [22m非成员创建返回 403，未登录返回 401，轨道不存在返回 404[33m 2364[2mms[22m[39m
+ [32m✓[39m tests/api/notes.test.ts[2m > [22m批量音符接口[2m > [22mbulk 创建 10 个音符一次写入[33m 1299[2mms[22m[39m
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2m批量音符接口[2m > [22m[2mbulk 创建：非数组 / 空数组 / 数组内非法音符返回 400 且不写入任何
+数据
+[22m[39m[error] POST /api/v1/tracks/cmw4p8g7a0023ki406yvy40wk/notes/bulk ValidationError: notes 必须是数组
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:63:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2m批量音符接口[2m > [22m[2mbulk 创建：非数组 / 空数组 / 数组内非法音符返回 400 且不写入任何
+数据
+[22m[39m[error] POST /api/v1/tracks/cmw4p8g7a0023ki406yvy40wk/notes/bulk ValidationError: 至少需要一个音符
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:63:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2m批量音符接口[2m > [22m[2mbulk 创建：非数组 / 空数组 / 数组内非法音符返回 400 且不写入任何
+数据
+[22m[39m[error] POST /api/v1/tracks/cmw4p8g7a0023ki406yvy40wk/notes/bulk ValidationError: 音高必须在 0-127 之间
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:63:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/notes.test.ts[2m > [22m批量音符接口[2m > [22mbulk 创建：非数组 / 空数组 / 数组内非法音符返回 400 且不写入任何数据[33m 1332[2mms[22m[39m
+ [32m✓[39m tests/api/notes.test.ts[2m > [22m批量音符接口[2m > [22mbulk 更新多个音符并落库[33m 1281[2mms[22m[39m
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2m批量音符接口[2m > [22m[2mbulk 更新引用了别的轨道的音符返回 404，且不产生部分更新
+[22m[39m[error] PUT /api/v1/tracks/cmw4p8i7a002nki4030j9wgr2/notes/bulk BusinessError: 音符不存在
+    at assertNotesBelongToTrack (C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:22:11)
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:86:5
+
+ [32m✓[39m tests/api/notes.test.ts[2m > [22m批量音符接口[2m > [22mbulk 更新引用了别的轨道的音符返回 404，且不产生部分更新[33m 1373[2mms[22m[39m
+ [32m✓[39m tests/api/notes.test.ts[2m > [22m批量音符接口[2m > [22mbulk 删除只删除存在的音符并返回删除数量[33m 1300[2mms[22m[39m
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2m批量音符接口[2m > [22m[2mbulk 删除 noteIds 为空返回 400
+[22m[39m[error] DELETE /api/v1/tracks/cmw4p8k9e003dki40jlp6c6pj/notes/bulk ValidationError: noteIds 不能为空
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:108:13
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/notes.test.ts[2m > [22m批量音符接口[2m > [22mbulk 删除 noteIds 为空返回 400[33m 1256[2mms[22m[39m
+ [32m✓[39m tests/api/notes.test.ts[2m > [22m单音符更新与删除[2m > [22mPUT 单个音符更新字段，DELETE 单个音符[33m 1347[2mms[22m[39m
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2m单音符更新与删除[2m > [22m[2m操作不属于该轨道的音符返回 404「音符不存在」
+[22m[39m[error] PUT /api/v1/tracks/cmw4p8m7p003tki404s1stzxy/notes/cmw4p8m9k003xki408aa3jq0q BusinessError: 音符不存在
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:133:13
+
+[90mstderr[2m | tests/api/notes.test.ts[2m > [22m[2m单音符更新与删除[2m > [22m[2m操作不属于该轨道的音符返回 404「音符不存在」
+[22m[39m[error] DELETE /api/v1/tracks/cmw4p8m7p003tki404s1stzxy/notes/cmw4p8m9k003xki408aa3jq0q BusinessError: 音符不存在
+    at C:/Users/10031/code/jam_box/backend/src/routes/notes.ts:154:13
+
+ [32m✓[39m tests/api/notes.test.ts[2m > [22m单音符更新与删除[2m > [22m操作不属于该轨道的音符返回 404「音符不存在」[33m 1274[2mms[22m[39m
+[90mstderr[2m | tests/unit/auth-lib.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/unit/auth-lib.test.ts[2m > [22m密码哈希[2m > [22mhashPassword 生成 cost 12 的 bcrypt 哈希且可正确比对[33m 981[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-lib.test.ts[2m > [22m密码哈希[2m > [22m明文不匹配时 comparePassword 返回 false[33m 1085[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-lib.test.ts[2m > [22mJWT 签发与校验[2m > [22maccess token 的 payload 仅含 sub/type/iat/exp 且有效期 900 秒[32m 9[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-lib.test.ts[2m > [22mJWT 签发与校验[2m > [22mrefresh token 的 type 为 refresh 且有效期 604800 秒[32m 5[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-lib.test.ts[2m > [22mJWT 签发与校验[2m > [22mverifyToken 返回 sub 与 type[32m 4[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-lib.test.ts[2m > [22mJWT 签发与校验[2m > [22m被篡改的 token 校验失败[32m 4[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-lib.test.ts[2m > [22mJWT 签发与校验[2m > [22m过期 token 校验抛 TokenExpiredError[32m 5[2mms[22m[39m
+ [32m✓[39m tests/unit/room-middleware.test.ts[2m > [22mrequireRoomRole[2m > [22mrequireRoomRole：房间不存在返回 404 房间不存在[32m 117[2mms[22m[39m
+ [32m✓[39m tests/unit/room-middleware.test.ts[2m > [22mrequireRoomRole[2m > [22m非成员返回 403 不是房间成员[32m 129[2mms[22m[39m
+ [32m✓[39m tests/unit/room-middleware.test.ts[2m > [22mrequireRoomRole[2m > [22m普通成员调用房主操作返回 403 无权限[32m 113[2mms[22m[39m
+ [32m✓[39m tests/unit/room-middleware.test.ts[2m > [22mrequireRoomRole[2m > [22m房主调用房主操作通过并注入 req.room 与 memberRole[32m 120[2mms[22m[39m
+ [32m✓[39m tests/unit/room-middleware.test.ts[2m > [22mrequireRoomRole[2m > [22m普通成员调用 member 级操作通过，房主同样通过[32m 127[2mms[22m[39m
+[90mstderr[2m | tests/api/jobs.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22mPOST /api/v1/jobs[2m > [22m提交合法任务后落库，返回 pending 任务结构[32m 211[2mms[22m[39m
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22mPOST /api/v1/jobs[2m > [22mpayload 缺省时允许创建，payload 为 null（边界）[32m 54[2mms[22m[39m
+[90mstderr[2m | tests/api/jobs.test.ts[2m > [22m[2mPOST /api/v1/jobs[2m > [22m[2m缺少 type 返回 400 与具体校验信息
+[22m[39m[error] POST /api/v1/jobs ZodError: [
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "type"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  }
+]
+    at C:/Users/10031/code/jam_box/backend/src/routes/jobs.ts:10:35
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/jobs.test.ts[2m > [22m[2mPOST /api/v1/jobs[2m > [22m[2mtype 为空字符串返回 400（边界）
+[22m[39m[error] POST /api/v1/jobs ZodError: [
+  {
+    "origin": "string",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "type"
+    ],
+    "message": "type 不能为空"
+  }
+]
+    at C:/Users/10031/code/jam_box/backend/src/routes/jobs.ts:10:35
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/jobs.test.ts[2m > [22m[2mPOST /api/v1/jobs[2m > [22m[2m请求体为非法 JSON 返回 400 而不是 500
+[22m[39m[error] POST /api/v1/jobs SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at parse (C:\Users\10031\code\jam_box\backend\node_modules\body-parser\lib\types\json.js:96:19)
+    at C:\Users\10031\code\jam_box\backend\node_modules\body-parser\lib\read.js:146:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:211:14)
+    at invokeCallback (C:\Users\10031\code\jam_box\backend\node_modules\raw-body\index.js:238:16)
+    at done (C:\Users\10031\code\jam_box\backend\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (C:\Users\10031\code\jam_box\backend\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:518:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22mPOST /api/v1/jobs[2m > [22m缺少 type 返回 400 与具体校验信息[32m 74[2mms[22m[39m
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22mPOST /api/v1/jobs[2m > [22mtype 为空字符串返回 400（边界）[32m 28[2mms[22m[39m
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22mPOST /api/v1/jobs[2m > [22m请求体为非法 JSON 返回 400 而不是 500[32m 22[2mms[22m[39m
+[90mstderr[2m | tests/api/jobs.test.ts[2m > [22m[2mGET /api/v1/jobs/:id[2m > [22m[2m查询不存在的任务返回 404 且错误码匹配
+[22m[39m[error] GET /api/v1/jobs/not-exists-id BusinessError: 任务不存在
+    at getJob (C:/Users/10031/code/jam_box/backend/src/queues/client.ts:19:11)
+    at C:/Users/10031/code/jam_box/backend/src/routes/jobs.ts:22:17
+
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22mGET /api/v1/jobs/:id[2m > [22m查询已存在任务返回完整结构[32m 57[2mms[22m[39m
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22mGET /api/v1/jobs/:id[2m > [22m查询不存在的任务返回 404 且错误码匹配[32m 42[2mms[22m[39m
+[90mstderr[2m | tests/api/jobs.test.ts[2m > [22m[2m路由与 CORS 边界[2m > [22m[2m未匹配的 API 路由返回统一 404 JSON
+[22m[39m[error] GET /api/v1/unknown-route BusinessError: 接口不存在
+    at C:/Users/10031/code/jam_box/backend/src/index.ts:55:10
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at trim_prefix (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:265:14)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+[90mstderr[2m | tests/api/jobs.test.ts[2m > [22m[2m路由与 CORS 边界[2m > [22m[2mPOST /api/v1/jobs/ 空路径（尾斜杠）返回统一 404
+[22m[39m[error] GET /api/v1/jobs/ BusinessError: 接口不存在
+    at C:/Users/10031/code/jam_box/backend/src/index.ts:55:10
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at trim_prefix (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:646:15
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:265:14)
+    at Function.handle (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:47:12)
+
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22m路由与 CORS 边界[2m > [22m未匹配的 API 路由返回统一 404 JSON[32m 27[2mms[22m[39m
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22m路由与 CORS 边界[2m > [22mPOST /api/v1/jobs/ 空路径（尾斜杠）返回统一 404[32m 15[2mms[22m[39m
+ [32m✓[39m tests/api/jobs.test.ts[2m > [22m路由与 CORS 边界[2m > [22mCORS 预检请求返回 204 并允许 POST[32m 9[2mms[22m[39m
+ [32m✓[39m tests/unit/room-lib.test.ts[2m > [22mgenerateRoomNumber[2m > [22m生成 6 位数字房间号，100 次调用均在 100000-999999 且不重复[32m 254[2mms[22m[39m
+ [32m✓[39m tests/unit/room-lib.test.ts[2m > [22mserializeRoom[2m > [22m移除 passwordHash 并保留房间与成员信息[32m 9[2mms[22m[39m
+ [32m✓[39m tests/unit/room-lib.test.ts[2m > [22mserializeRoom[2m > [22m无 owner / members 关系时返回 null 与空数组（边界）[32m 4[2mms[22m[39m
+[90mstdout[2m | tests/unit/worker.test.ts[2m > [22m[2m任务状态流转[2m > [22m[2m已注册 handler 执行成功后状态 pending → running → success 并写入结果
+[22m[39m[worker] job cmw4p8w1v0000ki1wsoyx2urn (test:echo) succeeded
+
+ [32m✓[39m tests/unit/worker.test.ts[2m > [22m任务状态流转[2m > [22m已注册 handler 执行成功后状态 pending → running → success 并写入结果[32m 80[2mms[22m[39m
+ [32m✓[39m tests/unit/worker.test.ts[2m > [22m任务状态流转[2m > [22m未注册类型直接标记 failed 并记录错误[32m 71[2mms[22m[39m
+[90mstdout[2m | tests/unit/worker.test.ts[2m > [22m[2m任务状态流转[2m > [22m[2m并发重复领取同一任务时 handler 只执行一次
+[22m[39m[worker] job cmw4p8w7n0003ki1wc580qsav (test:concurrent-once) succeeded
+
+ [32m✓[39m tests/unit/worker.test.ts[2m > [22m任务状态流转[2m > [22m重试次数耗尽后标记最终 failed[32m 62[2mms[22m[39m
+ [32m✓[39m tests/unit/worker.test.ts[2m > [22m任务状态流转[2m > [22m并发重复领取同一任务时 handler 只执行一次[32m 69[2mms[22m[39m
+ [32m✓[39m tests/unit/error-middleware.test.ts[2m > [22m全局错误中间件映射[2m > [22mBusinessError 404 映射为 HTTP 404 / code 404[32m 85[2mms[22m[39m
+ [32m✓[39m tests/unit/error-middleware.test.ts[2m > [22m全局错误中间件映射[2m > [22mAuthError 映射为 HTTP 401 / code 401[32m 16[2mms[22m[39m
+ [32m✓[39m tests/unit/error-middleware.test.ts[2m > [22m全局错误中间件映射[2m > [22mZodError 映射为 400 且带字段路径[32m 17[2mms[22m[39m
+ [32m✓[39m tests/unit/error-middleware.test.ts[2m > [22m全局错误中间件映射[2m > [22mPrisma P2002 唯一约束冲突映射为 409[32m 13[2mms[22m[39m
+ [32m✓[39m tests/unit/error-middleware.test.ts[2m > [22m全局错误中间件映射[2m > [22mJSON 解析错误映射为 400[32m 12[2mms[22m[39m
+ [32m✓[39m tests/unit/error-middleware.test.ts[2m > [22m全局错误中间件映射[2m > [22m依赖不可达（ECONNREFUSED）映射为 500 且不泄露堆栈[32m 9[2mms[22m[39m
+ [32m✓[39m tests/unit/error-middleware.test.ts[2m > [22m全局错误中间件映射[2m > [22m每次错误都会记录日志[32m 9[2mms[22m[39m
+[90mstderr[2m | tests/api/health.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/api/health.test.ts[2m > [22m健康检查与联调接口[2m > [22mGET /health 返回统一格式且带安全响应头[32m 95[2mms[22m[39m
+[90mstderr[2m | tests/api/health.test.ts[2m > [22m[2m健康检查与联调接口[2m > [22m[2mGET /health 对未允许来源返回 CORS 错误（500 由中间
+件统一格式）
+[22m[39m[error] GET /health Error: CORS: 不允许的来源 http://evil.example.com
+    at origin (C:/Users/10031/code/jam_box/backend/src/middleware/cors-helmet.ts:26:18)
+    at C:\Users\10031\code\jam_box\backend\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\10031\code\jam_box\backend\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\10031\code\jam_box\backend\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\layer.js:9
+5:5)
+    at trim_prefix (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\10031\code\jam_box\backend\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (file:///C:/Users/10031/code/jam_box/backend/node_modules/helmet/index.mjs:554:6)
+
+ [32m✓[39m tests/api/health.test.ts[2m > [22m健康检查与联调接口[2m > [22mGET /api/v1/health 可访问（双挂载边界）[32m 14[2mms[22m[39m
+ [32m✓[39m tests/api/health.test.ts[2m > [22m健康检查与联调接口[2m > [22mGET /api/v1/hello 返回统一响应格式[32m 8[2mms[22m[39m
+ [32m✓[39m tests/api/health.test.ts[2m > [22m健康检查与联调接口[2m > [22mGET /health 对未允许来源返回 CORS 错误（500 由中间件统一格式）[32m 17[2mms[22m[39m
+ [32m✓[39m tests/unit/response-middleware.test.ts[2m > [22m统一响应格式中间件[2m > [22m原始值被包装为 {code:0,msg:'ok',data}[32m 71[2mms[22m[39m
+ [32m✓[39m tests/unit/response-middleware.test.ts[2m > [22m统一响应格式中间件[2m > [22m对象被包装，字段值不丢失[32m 12[2mms[22m[39m
+ [32m✓[39m tests/unit/response-middleware.test.ts[2m > [22m统一响应格式中间件[2m > [22mundefined 被归一化为 data:null[32m 8[2mms[22m[39m
+ [32m✓[39m tests/unit/response-middleware.test.ts[2m > [22m统一响应格式中间件[2m > [22mrawResponse 标记时跳过包装（供错误中间件使用）[32m 12[2mms[22m[39m
+[90mstderr[2m | tests/unit/ai-handlers.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mcomposeHandler 业务校验[2m > [22m未配置 LLM（provider=null）抛出友好错误[32m 10[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mcomposeHandler 业务校验[2m > [22mLLM 返回合法轨道：原样返回 tracks，prompt 渲染 instruction 与 bpm[32m 11[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mcomposeHandler 业务校验[2m > [22mpitch=150 被拦截，错误含校验摘要且不含原始 JSON 输出[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mcomposeHandler 业务校验[2m > [22mdurationTicks=240 被拦截[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mcomposeHandler 业务校验[2m > [22mvelocity=200 被拦截[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mcomposeHandler 业务校验[2m > [22mstartTimeTicks 为负数被拦截[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mcomposeHandler 业务校验[2m > [22minstrumentType 不在枚举内被拦截[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mcomposeHandler 业务校验[2m > [22mcolor 非十六进制被拦截[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mfixHandler 业务校验[2m > [22m未配置 LLM（provider=null）抛出友好错误[32m 4[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mfixHandler 业务校验[2m > [22m修复结果保留轨道与音符 id，issues 渲染进 prompt[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/ai-handlers.test.ts[2m > [22mfixHandler 业务校验[2m > [22m修复结果 velocity=200 仍被业务校验拦截[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/track-validators.test.ts[2m > [22mcreateTrackSchema[2m > [22m四种乐器类型均合法[32m 7[2mms[22m[39m
+ [32m✓[39m tests/unit/track-validators.test.ts[2m > [22mcreateTrackSchema[2m > [22m轨道名 0 / 1 / 50 / 51 字符边界[32m 3[2mms[22m[39m
+ [32m✓[39m tests/unit/track-validators.test.ts[2m > [22mcreateTrackSchema[2m > [22m轨道名会 trim 后再校验[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/track-validators.test.ts[2m > [22mcreateTrackSchema[2m > [22m非法乐器类型返回 spec 指定错误信息[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/track-validators.test.ts[2m > [22mcreateTrackSchema[2m > [22m颜色必须是 6 位十六进制，缺省时允许[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/track-validators.test.ts[2m > [22mupdateTrackSchema[2m > [22m允许部分字段更新，position 0 为合法下界[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/track-validators.test.ts[2m > [22mupdateTrackSchema[2m > [22mposition 为负返回 spec 指定错误信息[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/track-validators.test.ts[2m > [22mupdateTrackSchema[2m > [22m非法颜色返回错误信息[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/track-validators.test.ts[2m > [22mupdateTrackSchema[2m > [22minstrumentType / roomId 不可修改：未知字段被剥离[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/room-editor-store.test.ts[2m > [22mroomEditorStore 音符编辑与撤销/重做[2m > [22maddNote：先写库，再追加音符并清空 future 栈[32m 11[2mms[22m[39m
+ [32m✓[39m tests/unit/room-editor-store.test.ts[2m > [22mroomEditorStore 音符编辑与撤销/重做[2m > [22mundo 撤销新增 → 调用 bulkDeleteNotes 删除；redo 重做 → bulkCreateNotes 重建并回填新 id[32m 3[2mms[22m[39m
+ [32m✓[39m tests/unit/room-editor-store.test.ts[2m > [22mroomEditorStore 音符编辑与撤销/重做[2m > [22mupdateNotes：用服务端返回值覆盖本地音符[32m 3[2mms[22m[39m
+ [32m✓[39m tests/unit/room-editor-store.test.ts[2m > [22mroomEditorStore 音符编辑与撤销/重做[2m > [22mdeleteNotes 后 undo：按快照重建音符（服务端新 id 回填本地）[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/room-editor-store.test.ts[2m > [22mroomEditorStore 音符编辑与撤销/重做[2m > [22m新的编辑会清空 future（撤销后再编辑无法重做旧分支）[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/room-editor-store.test.ts[2m > [22mroomEditorStore 音符编辑与撤销/重做[2m > [22m没有可撤销记录时 undo 不调用任何接口[32m 4[2mms[22m[39m
+ [32m✓[39m tests/unit/room-editor-store.test.ts[2m > [22mroomEditorStore 音符编辑与撤销/重做[2m > [22mtoggleTrackFlag 调 updateTrack 并同步 store[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mcreateNoteSchema[2m > [22m合法音符：velocity 缺省为 100[32m 6[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mcreateNoteSchema[2m > [22mpitch 0 / 127、velocity 0 / 127、durationTicks 480 为合法边界[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mcreateNoteSchema[2m > [22mpitch 超出 0-127 返回 spec 指定错误信息[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mcreateNoteSchema[2m > [22mpitch 非整数返回「音高必须是整数」[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mcreateNoteSchema[2m > [22mstartTimeTicks 为负、durationTicks 小于 480、velocity 超界分别返回错误[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mbulkCreateNotesSchema[2m > [22m数组内任意一个音符非法时整体失败[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mbulkCreateNotesSchema[2m > [22m空数组与非数组均失败[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mbulkUpdateNotesSchema[2m > [22m缺少 id 返回「音符 id 不能为空」[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mbulkUpdateNotesSchema[2m > [22m空数组失败，单条部分更新成功[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mupdateNoteSchema[2m > [22m允许部分更新，且不接受 id 字段[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mupdateNoteSchema[2m > [22m非法 durationTicks 返回错误信息[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mbulkDeleteNotesSchema[2m > [22m空 noteIds 返回「noteIds 不能为空」[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/note-validators.test.ts[2m > [22mbulkDeleteNotesSchema[2m > [22m合法 id 列表通过[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/validators.test.ts[2m > [22m任务接口输入校验[2m > [22m合法 body 通过并保留 payload[32m 7[2mms[22m[39m
+ [32m✓[39m tests/unit/validators.test.ts[2m > [22m任务接口输入校验[2m > [22mpayload 可省略[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/validators.test.ts[2m > [22m任务接口输入校验[2m > [22m缺少 type 被拒绝[32m 4[2mms[22m[39m
+ [32m✓[39m tests/unit/validators.test.ts[2m > [22m任务接口输入校验[2m > [22m空字符串 type 被拒绝（边界）[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/validators.test.ts[2m > [22m任务接口输入校验[2m > [22mtask id 为空被拒绝[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mregisterSchema[2m > [22m合法输入通过并保留字段[32m 6[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mregisterSchema[2m > [22memail 可省略（边界）[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mregisterSchema[2m > [22m用户名少于 3 位被拒绝[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mregisterSchema[2m > [22m用户名超过 32 位被拒绝（边界）[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mregisterSchema[2m > [22m用户名含非法字符被拒绝[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mregisterSchema[2m > [22m密码缺少数字被拒绝[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mregisterSchema[2m > [22m密码缺少字母被拒绝[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mregisterSchema[2m > [22m密码少于 8 位被拒绝（边界）[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mregisterSchema[2m > [22m非法邮箱被拒绝且消息与 spec 一致[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mloginSchema[2m > [22m用户名与密码非空时通过[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mloginSchema[2m > [22m空密码被拒绝（边界）[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mloginSchema[2m > [22m缺少用户名被拒绝[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mrefreshSchema[2m > [22mrefreshToken 非空时通过[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-validators.test.ts[2m > [22mrefreshSchema[2m > [22m空 refreshToken 被拒绝（边界）[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/room-validators.test.ts[2m > [22mcreateRoomSchema[2m > [22m公开房间：合法房间名通过并默认 isPublic=true[32m 8[2mms[22m[39m
+ [32m✓[39m tests/unit/room-validators.test.ts[2m > [22mcreateRoomSchema[2m > [22m房间名 1 与 50 字符为合法边界[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/room-validators.test.ts[2m > [22mcreateRoomSchema[2m > [22m房间名空串与 51 字符返回错误且消息与 spec 一致[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/room-validators.test.ts[2m > [22mcreateRoomSchema[2m > [22m私有房间密码 8 与 32 字符为合法边界[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/room-validators.test.ts[2m > [22mcreateRoomSchema[2m > [22m私有房间缺少密码或密码长度越界返回错误[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/room-validators.test.ts[2m > [22mcreateRoomSchema[2m > [22m缺少 name 或 isPublic 非布尔值返回错误[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/room-validators.test.ts[2m > [22mjoinRoomSchema[2m > [22m空对象（公开房间不带密码）通过[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/room-validators.test.ts[2m > [22mjoinRoomSchema[2m > [22m密码 8 与 32 字符为合法边界[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/room-validators.test.ts[2m > [22mjoinRoomSchema[2m > [22m密码 7 与 33 字符返回错误[32m 1[2mms[22m[39m
+[90mstderr[2m | tests/unit/env.test.ts
+[22m[39m◇ injected env (3) from .env
+◇ injected env (0) from backend\.env
+
+ [32m✓[39m tests/unit/env.test.ts[2m > [22m环境变量校验[2m > [22m合法配置通过并应用默认端口[32m 4[2mms[22m[39m
+ [32m✓[39m tests/unit/env.test.ts[2m > [22m环境变量校验[2m > [22m缺少 DATABASE_URL 失败并给出具体字段[32m 4[2mms[22m[39m
+ [32m✓[39m tests/unit/env.test.ts[2m > [22m环境变量校验[2m > [22m缺少 JWT_SECRET 失败并给出具体字段[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/env.test.ts[2m > [22m环境变量校验[2m > [22m端口不是数字时失败（边界）[32m 1[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m22 passed[39m[22m[90m (22)[39m
+[2m      Tests [22m [1m[32m239 passed[39m[22m[90m (239)[39m
+[2m   Start at [22m 16:11:37
+[2m   Duration [22m 237.51s[2m (tests 79%, import 20%, transform 1%)[22m
+
+[2m    Isolate [22m [33m22 workers spawned[39m[2m · ~636ms startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~13.36s faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+
+JSON report written to C:/Users/10031/code/jam_box/tests/.tmp/results.json
+[report] security-precheck.md
+[report] risk-authz.md
+[report] risk-concurrency.md
+[report] risk-transaction.md
+[report] security-baseline.md
+[report] review-01.md
+[report] test-report.md
+
+[test] 结果：总数 239 / 通过 239 / 失败 0 / 跳过 0
+[test] 报告目录：reports/2026-11-06-2f3c26a
+
+[test] 全部通过

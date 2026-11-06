@@ -12,6 +12,7 @@ import authRouter from "./routes/auth";
 import roomsRouter from "./routes/rooms";
 import { roomTracksRouter, tracksRouter } from "./routes/tracks";
 import notesRouter from "./routes/notes";
+import aiRouter from "./routes/ai";
 import { authenticateAccessToken } from "./middleware/auth";
 import { requireRoomMember, requireTrackAccess } from "./middleware/roomMember";
 import { config } from "./utils/env";
@@ -46,6 +47,8 @@ export function createApp(): Express {
   );
   app.use("/api/v1/tracks/:trackId/notes", authenticateAccessToken, requireTrackAccess, notesRouter);
   app.use("/api/v1/tracks", authenticateAccessToken, tracksRouter);
+  // AI 能力：全部路由需要登录；compose/fix 在路由内按 body.roomId 校验成员身份
+  app.use("/api/v1/ai", authenticateAccessToken, aiRouter);
 
   // 未匹配路由统一返回 404 JSON，而非 Express 默认 HTML
   app.use((_req, _res, next) => {

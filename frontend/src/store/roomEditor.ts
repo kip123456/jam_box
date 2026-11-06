@@ -21,6 +21,22 @@ export const DEFAULT_TOTAL_BEATS = 16;
 
 type Snapshot = Track[];
 
+/** AI 预览内容：与后端 AI 输出结构一致，未入库前只在 PianoRoll/TrackList 半透明展示 */
+export interface PreviewNote {
+  pitch: number;
+  startTimeTicks: number;
+  durationTicks: number;
+  velocity: number;
+}
+
+export interface PreviewTrack {
+  id?: string;
+  name: string;
+  instrumentType: InstrumentType;
+  color: string;
+  notes: PreviewNote[];
+}
+
 function cloneTracks(tracks: Track[]): Track[] {
   return tracks.map((track) => ({ ...track, notes: track.notes.map((note) => ({ ...note })) }));
 }
@@ -124,10 +140,13 @@ interface RoomEditorState {
   isPlaying: boolean;
   past: Snapshot[];
   future: Snapshot[];
+  /** AI 编曲/修复的预览内容，接受后清空；null 表示无预览 */
+  previewTracks: PreviewTrack[] | null;
 
   loadRoom: (roomId: string) => Promise<void>;
   reset: () => void;
   selectTrack: (trackId: string | null) => void;
+  setPreviewTracks: (tracks: PreviewTrack[] | null) => void;
   setBpm: (bpm: number) => void;
   setLoop: (startTicks: number, endTicks: number) => void;
   setPlayhead: (ticks: number) => void;
@@ -160,6 +179,7 @@ export const useRoomEditorStore = create<RoomEditorState>((set, get) => ({
   isPlaying: false,
   past: [],
   future: [],
+  previewTracks: null,
 
   loadRoom: async (roomId) => {
     set({ loading: true, error: "", roomId });
@@ -175,6 +195,7 @@ export const useRoomEditorStore = create<RoomEditorState>((set, get) => ({
         playheadTicks: 0,
         loopStartTicks: 0,
         loopEndTicks: DEFAULT_TOTAL_BEATS * TICKS_PER_BEAT,
+        previewTracks: null,
       });
     } catch (err) {
       set({
@@ -201,9 +222,12 @@ export const useRoomEditorStore = create<RoomEditorState>((set, get) => ({
       isPlaying: false,
       past: [],
       future: [],
+      previewTracks: null,
     }),
 
   selectTrack: (trackId) => set({ selectedTrackId: trackId }),
+
+  setPreviewTracks: (tracks) => set({ previewTracks: tracks }),
 
   setBpm: (bpm) => {
     if (!Number.isFinite(bpm)) return;

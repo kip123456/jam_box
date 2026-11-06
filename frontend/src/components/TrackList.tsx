@@ -21,6 +21,7 @@ export function TrackList() {
   const renameTrack = useRoomEditorStore((state) => state.renameTrack);
   const toggleTrackFlag = useRoomEditorStore((state) => state.toggleTrackFlag);
   const removeTrack = useRoomEditorStore((state) => state.removeTrack);
+  const previewTracks = useRoomEditorStore((state) => state.previewTracks);
 
   const [instrument, setInstrument] = useState<InstrumentType>("piano");
   const [busy, setBusy] = useState(false);
@@ -129,6 +130,31 @@ export function TrackList() {
                   />
                   <span className={track.mute ? "font-semibold text-destructive" : undefined}>MUTE</span>
                 </label>
+              </div>
+            </div>
+          );
+        })}
+        {previewTracks?.map((track, index) => {
+          const meta = INSTRUMENT_META[track.instrumentType];
+          return (
+            <div
+              key={`preview-${track.id ?? index}`}
+              className="pointer-events-none rounded-md border border-dashed border-primary/60 p-2 opacity-50"
+            >
+              <div className="flex items-center gap-2">
+                <span aria-hidden className="text-lg">
+                  {meta.icon}
+                </span>
+                <span className="min-w-0 flex-1 truncate px-1 text-sm font-medium">
+                  {track.name}
+                </span>
+                <span
+                  className="h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: track.color }}
+                />
+                <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
+                  预览
+                </span>
               </div>
             </div>
           );

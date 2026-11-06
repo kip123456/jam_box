@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 import { PlayControls } from "@/components/PlayControls";
 import { TrackList } from "@/components/TrackList";
 import { PianoRoll } from "@/components/PianoRoll";
+import AISidebar from "@/components/ai/AISidebar";
+import { Button } from "@/components/ui/button";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  usePanelRef,
+} from "@/components/ui/resizable";
 import { useRoomEditorStore } from "@/store/roomEditor";
 import * as audio from "@/lib/audio";
 
@@ -17,6 +26,18 @@ export default function RoomDetail() {
   const redo = useRoomEditorStore((state) => state.redo);
 
   const [actionError, setActionError] = useState("");
+  const aiPanelRef = usePanelRef();
+  const [aiCollapsed, setAiCollapsed] = useState(false);
+
+  function toggleAiPanel() {
+    const panel = aiPanelRef.current;
+    if (!panel) return;
+    if (panel.isCollapsed()) {
+      panel.expand();
+    } else {
+      panel.collapse();
+    }
+  }
 
   useEffect(() => {
     if (roomId) {
@@ -72,9 +93,21 @@ export default function RoomDetail() {
               )}
             </h1>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Ctrl+Z 撤销 · Ctrl+Shift+Z / Ctrl+Y 重做 · 空格播放/暂停 · Delete 删除音符
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-muted-foreground">
+              Ctrl+Z 撤销 · Ctrl+Shift+Z / Ctrl+Y 重做 · 空格播放/暂停 · Delete 删除音符
+            </p>
+            {room && room.isMember && (
+              <Button
+                variant={aiCollapsed ? "outline" : "secondary"}
+                size="sm"
+                onClick={toggleAiPanel}
+              >
+                <Sparkles className="h-4 w-4" />
+                AI 助手
+              </Button>
+            )}
+          </div>
         </div>
 
         {(error || actionError) && (
@@ -90,10 +123,28 @@ export default function RoomDetail() {
         ) : room ? (
           <>
             <PlayControls />
-            <div className="flex gap-4">
-              <TrackList />
-              <PianoRoll />
-            </div>
+            <ResizablePanelGroup
+              orientation="horizontal"
+              className="h-[calc(100vh-240px)] min-h-[540px]"
+            >
+              <ResizablePanel defaultSize="74%" minSize="45%">
+                <div className="flex h-full gap-4">
+                  <TrackList />
+                  <PianoRoll />
+                </div>
+              </ResizablePanel>
+              <ResizableHandle />
+              <ResizablePanel
+                collapsible
+                collapsedSize="0%"
+                defaultSize="26%"
+                minSize="300px"
+                panelRef={aiPanelRef}
+                onResize={(size) => setAiCollapsed(size.asPercentage === 0)}
+              >
+                <AISidebar onCollapse={() => aiPanelRef.current?.collapse()} />
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </>
         ) : (
           !error && <p className="text-sm text-muted-foreground">未找到房间。</p>
