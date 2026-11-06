@@ -40,6 +40,8 @@ export function serializeRoom(room: RoomWithRelations) {
     name: room.name,
     isPublic: room.isPublic,
     status: room.status,
+    bpm: room.bpm,
+    endedAt: room.endedAt,
     createdAt: room.createdAt,
     updatedAt: room.updatedAt,
     owner: room.owner ? { id: room.owner.id, username: room.owner.username } : null,

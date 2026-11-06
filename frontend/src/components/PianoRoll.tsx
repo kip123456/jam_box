@@ -50,9 +50,11 @@ interface YjsActions {
 
 interface PianoRollProps {
   yjsActions?: YjsActions;
+  /** 只读回放：禁止添加/拖动/删除音符 */
+  readOnly?: boolean;
 }
 
-export function PianoRoll({ yjsActions }: PianoRollProps) {
+export function PianoRoll({ yjsActions, readOnly = false }: PianoRollProps) {
   const tracks = useRoomEditorStore((state) => state.tracks);
   const selectedTrackId = useRoomEditorStore((state) => state.selectedTrackId);
   const playheadTicks = useRoomEditorStore((state) => state.playheadTicks);
@@ -94,6 +96,7 @@ export function PianoRoll({ yjsActions }: PianoRollProps) {
   // Delete / Backspace 删除选中音符
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
+      if (readOnly) return;
       if (event.key !== "Delete" && event.key !== "Backspace") return;
       const target = event.target as HTMLElement | null;
       if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
@@ -111,7 +114,7 @@ export function PianoRoll({ yjsActions }: PianoRollProps) {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedNoteId, selectedTrackId, deleteNotes, useYjs, yjsActions]);
+  }, [selectedNoteId, selectedTrackId, deleteNotes, useYjs, yjsActions, readOnly]);
 
   // 拖拽移动音符（pointermove 更新预览，pointerup 提交 bulk 更新）
   useEffect(() => {
@@ -169,6 +172,7 @@ export function PianoRoll({ yjsActions }: PianoRollProps) {
   function beginDrag(event: React.PointerEvent<HTMLDivElement>, note: Note) {
     event.stopPropagation();
     setSelectedNoteId(note.id);
+    if (readOnly) return;
     const state: DragState = {
       id: note.id,
       startX: event.clientX,
@@ -184,7 +188,7 @@ export function PianoRoll({ yjsActions }: PianoRollProps) {
   }
 
   function handleAddNote(event: React.PointerEvent<HTMLDivElement>) {
-    if (!track) return;
+    if (!track || readOnly) return;
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -215,7 +219,7 @@ export function PianoRoll({ yjsActions }: PianoRollProps) {
   if (!track && !hasPreview) {
     return (
       <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed bg-card text-sm text-muted-foreground">
-        先在左侧添加或选择一条轨道，然后在钢琴卷帘上点击添加音符。
+        {readOnly ? "该房间没有可回放的轨道。" : "先在左侧添加或选择一条轨道，然后在钢琴卷帘上点击添加音符。"}
       </div>
     );
   }
@@ -227,7 +231,7 @@ export function PianoRoll({ yjsActions }: PianoRollProps) {
           {track ? `${track.name} · MIDI 音高 ${PITCH_MIN}-${PITCH_MAX}` : "AI 预览"}
         </span>
         <span className="text-xs text-muted-foreground">
-          点击空白添加音符，拖动移动，选中后按 Delete 删除
+          {readOnly ? "只读回放" : "点击空白添加音符，拖动移动，选中后按 Delete 删除"}
         </span>
       </div>
 
@@ -278,7 +282,10 @@ export function PianoRoll({ yjsActions }: PianoRollProps) {
             </div>
 
             <div
-              className="relative cursor-crosshair"
+              className={cn(
+                "relative",
+                readOnly ? "cursor-default" : "cursor-crosshair"
+              )}
               style={{ width: GRID_WIDTH, height: GRID_HEIGHT }}
               onPointerDown={handleAddNote}
             >
@@ -321,7 +328,8 @@ export function PianoRoll({ yjsActions }: PianoRollProps) {
                       setSelectedNoteId(note.id);
                     }}
                     className={cn(
-                      "absolute cursor-grab rounded-sm border border-black/30",
+                      "absolute rounded-sm border border-black/30",
+                      readOnly ? "cursor-default" : "cursor-grab",
                       selectedNoteId === note.id && "z-10 ring-2 ring-primary",
                       active && "z-10 cursor-grabbing"
                     )}

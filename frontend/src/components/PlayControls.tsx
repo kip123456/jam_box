@@ -10,7 +10,7 @@ import {
 } from "@/store/roomEditor";
 import * as audio from "@/lib/audio";
 
-export function PlayControls() {
+export function PlayControls({ readOnly = false }: { readOnly?: boolean }) {
   const bpm = useRoomEditorStore((state) => state.bpm);
   const loopStartTicks = useRoomEditorStore((state) => state.loopStartTicks);
   const loopEndTicks = useRoomEditorStore((state) => state.loopEndTicks);
@@ -122,9 +122,9 @@ export function PlayControls() {
         <Button
           variant={isPlaying ? "secondary" : "default"}
           onClick={() => void handlePlay()}
-          aria-label="播放"
+          aria-label={readOnly ? "回放" : "播放"}
         >
-          <Play className="h-4 w-4" /> 播放
+          <Play className="h-4 w-4" /> {readOnly ? "回放" : "播放"}
         </Button>
         <Button
           variant="outline"
@@ -139,6 +139,8 @@ export function PlayControls() {
         </Button>
       </div>
 
+      {!readOnly && (
+        <>
       <label className="flex flex-col gap-1 text-xs text-muted-foreground">
         BPM（{BPM_MIN}-{BPM_MAX}）
         <input
@@ -182,6 +184,8 @@ export function PlayControls() {
           className="h-8 w-24 rounded-md border border-input bg-transparent px-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
         />
       </label>
+        </>
+      )}
 
       <span className="ml-auto font-mono text-xs text-muted-foreground">
         播放头 {Math.round(playheadTicks / TICKS_PER_BEAT)} / {DEFAULT_TOTAL_BEATS} 拍

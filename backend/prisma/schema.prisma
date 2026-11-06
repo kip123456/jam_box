@@ -52,6 +52,8 @@ model Room {
   isPublic     Boolean    @default(true)
   passwordHash String?
   status       RoomStatus @default(active)
+  bpm          Int        @default(120)
+  endedAt      DateTime?
   ownerId      String
   owner        User       @relation("RoomOwner", fields: [ownerId], references: [id])
   createdAt    DateTime   @default(now())
@@ -121,6 +123,17 @@ model Note {
   track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
 
   @@index([trackId])
+}
+
+/** 已结束房间的公开分享链接 */
+model ShareLink {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  roomId    String
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  @@index([roomId])
 }
 
 /** Yjs CRDT 文档持久化（每个房间一份） */
