@@ -1,7 +1,7 @@
 import "./utils/env";
 import path from "path";
 import fs from "fs";
-import express from "express";
+import express, { type Express } from "express";
 import { fork } from "child_process";
 import { applySecurityMiddleware } from "./middleware/cors-helmet";
 import { responseMiddleware } from "./middleware/response";
@@ -10,25 +10,36 @@ import healthRouter from "./routes/health";
 import jobsRouter from "./routes/jobs";
 import { config } from "./utils/env";
 import prisma from "./lib/prisma";
+import { BusinessError } from "./lib/errors";
 
-const app = express();
+/** 组装 Express 应用（不监听端口，供测试与运行时复用） */
+export function createApp(): Express {
+  const app = express();
 
-// body parser
-app.use(express.json());
+  // body parser
+  app.use(express.json());
 
-// 安全中间件（Helmet + CORS）
-applySecurityMiddleware(app);
+  // 安全中间件（Helmet + CORS）
+  applySecurityMiddleware(app);
 
-// 统一响应格式
-app.use(responseMiddleware);
+  // 统一响应格式
+  app.use(responseMiddleware);
 
-// 路由
-app.use("/", healthRouter);
-app.use("/api/v1", healthRouter);
-app.use("/api/v1/jobs", jobsRouter);
+  // 路由
+  app.use("/", healthRouter);
+  app.use("/api/v1", healthRouter);
+  app.use("/api/v1/jobs", jobsRouter);
 
-// 全局错误处理（必须最后）
-app.use(errorMiddleware);
+  // 未匹配路由统一返回 404 JSON，而非 Express 默认 HTML
+  app.use((_req, _res, next) => {
+    next(new BusinessError("接口不存在", 404));
+  });
+
+  // 全局错误处理（必须最后）
+  app.use(errorMiddleware);
+
+  return app;
+}
 
 function startWorker(): void {
   const jsPath = path.join(__dirname, "queues", "worker.js");
@@ -53,14 +64,19 @@ async function start(): Promise<void> {
   await prisma.$connect();
   console.log("[backend] database connected");
 
+  const app = createApp();
   app.listen(config.backendPort, () => {
     console.log(`[backend] listening on port ${config.backendPort}`);
     startWorker();
   });
 }
 
-start().catch(async (err) => {
-  console.error("[backend] failed to start", err);
-  await prisma.$disconnect().catch(() => undefined);
-  process.exit(1);
-});
+const isEntryPoint = typeof require !== "undefined" && require.main === module;
+
+if (isEntryPoint) {
+  start().catch(async (err) => {
+    console.error("[backend] failed to start", err);
+    await prisma.$disconnect().catch(() => undefined);
+    process.exit(1);
+  });
+}

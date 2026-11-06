@@ -16,7 +16,12 @@ const envSchema = z.object({
   LLM_API_KEY: z.string().optional(),
 });
 
-const parsed = envSchema.safeParse(process.env);
+/** 校验任意环境变量对象，便于单元测试注入 */
+export function parseEnv(raw: NodeJS.ProcessEnv) {
+  return envSchema.safeParse(raw);
+}
+
+const parsed = parseEnv(process.env);
 
 if (!parsed.success) {
   const details = parsed.error.issues

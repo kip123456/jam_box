@@ -23,6 +23,14 @@ export function errorMiddleware(
     msg = err.issues
       .map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`)
       .join("; ");
+  } else if (
+    err instanceof SyntaxError &&
+    ("body" in err || (err as { type?: string }).type === "entity.parse.failed")
+  ) {
+    // express.json() 解析失败：属于客户端输入错误，不应记为 500
+    status = 400;
+    code = 400;
+    msg = "请求体不是合法的 JSON";
   } else if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
     status = 409;
     code = 409;

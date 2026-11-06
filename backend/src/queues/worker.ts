@@ -27,7 +27,7 @@ async function executeHandler(handler: JobHandler, payload: unknown): Promise<un
   }
 }
 
-async function runJob(jobId: string): Promise<void> {
+export async function runJob(jobId: string): Promise<void> {
   // 原子条件更新：只有 pending 状态的任务才能被领取，避免重复执行
   const claimed = await prisma.job.updateMany({
     where: { id: jobId, status: "pending" },
@@ -91,7 +91,7 @@ async function runJob(jobId: string): Promise<void> {
         where: { id: job.id },
         data: {
           status: "failed",
-          retryCount: nextRetryCount,
+          retryCount: job.retryCount,
           error: message,
           completedAt: new Date(),
         },
@@ -150,12 +150,16 @@ function shutdown(): void {
     .finally(() => process.exit(0));
 }
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
-process.on("disconnect", shutdown);
+const isEntryPoint = typeof require !== "undefined" && require.main === module;
 
-main().catch(async (err) => {
-  console.error("[worker] failed to start", err);
-  await prisma.$disconnect().catch(() => undefined);
-  process.exit(1);
-});
+if (isEntryPoint) {
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
+  process.on("disconnect", shutdown);
+
+  main().catch(async (err) => {
+    console.error("[worker] failed to start", err);
+    await prisma.$disconnect().catch(() => undefined);
+    process.exit(1);
+  });
+}
