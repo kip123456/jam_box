@@ -15,6 +15,7 @@ import {
   findRoomByParam,
   roomInclude,
 } from "../lib/room";
+import { serializeTrack } from "../lib/track";
 
 const router = Router();
 
@@ -98,10 +99,14 @@ router.get(
         ? room.members.find((item) => item.userId === req.user!.id)
         : undefined;
 
+      // 私有房间不向非成员暴露编曲数据（对应前端「不加载轨道数据」）
+      const canViewTracks = room.isPublic || Boolean(member);
+
       res.json({
         ...serializeRoom(room),
         isMember: Boolean(member),
         role: member?.role ?? null,
+        tracks: canViewTracks ? (room.tracks ?? []).map(serializeTrack) : [],
       });
     } catch (err) {
       next(err);

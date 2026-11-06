@@ -15,6 +15,11 @@ const VALID = {
 };
 
 beforeEach(async () => {
+  // 先清空依赖 User 的记录，避免 Track/房间外键约束阻止删除用户
+  await prisma.note.deleteMany({});
+  await prisma.track.deleteMany({});
+  await prisma.roomMember.deleteMany({});
+  await prisma.room.deleteMany({});
   await prisma.user.deleteMany({});
 });
 

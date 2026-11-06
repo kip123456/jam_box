@@ -10,6 +10,10 @@ import healthRouter from "./routes/health";
 import jobsRouter from "./routes/jobs";
 import authRouter from "./routes/auth";
 import roomsRouter from "./routes/rooms";
+import { roomTracksRouter, tracksRouter } from "./routes/tracks";
+import notesRouter from "./routes/notes";
+import { authenticateAccessToken } from "./middleware/auth";
+import { requireRoomMember, requireTrackAccess } from "./middleware/roomMember";
 import { config } from "./utils/env";
 import prisma from "./lib/prisma";
 import { BusinessError } from "./lib/errors";
@@ -33,6 +37,15 @@ export function createApp(): Express {
   app.use("/api/v1/jobs", jobsRouter);
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/rooms", roomsRouter);
+  // 轨道/音符：先鉴权，再按房间（或轨道所属房间）校验成员身份
+  app.use(
+    "/api/v1/rooms/:roomId/tracks",
+    authenticateAccessToken,
+    requireRoomMember,
+    roomTracksRouter
+  );
+  app.use("/api/v1/tracks/:trackId/notes", authenticateAccessToken, requireTrackAccess, notesRouter);
+  app.use("/api/v1/tracks", authenticateAccessToken, tracksRouter);
 
   // 未匹配路由统一返回 404 JSON，而非 Express 默认 HTML
   app.use((_req, _res, next) => {
