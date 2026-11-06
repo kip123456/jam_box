@@ -21,3 +21,12 @@ export function getHandler(type: string): JobHandler | undefined {
 export function getRegisteredTypes(): string[] {
   return Array.from(handlers.keys());
 }
+
+/** 集中注册所有任务处理器，worker 启动时调用一次 */
+export function registerAll(): void {
+  // 延迟 require 避免 handlers.ts（注册表）与具体 handler 之间形成循环依赖
+  const { composeHandler, fixHandler } = require("./handlers/aiHandlers") as typeof import("./handlers/aiHandlers");
+  registerHandler("ai-compose", composeHandler);
+  registerHandler("ai-fix", fixHandler);
+  console.log(`[worker] registered handlers: ${getRegisteredTypes().join(", ")}`);
+}

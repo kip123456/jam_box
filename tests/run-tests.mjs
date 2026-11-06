@@ -1806,6 +1806,12 @@ function buildReports({
   precheck.push("| DELETE | /api/v1/rooms/:roomId/members/:userId | 需 access token + 房间 owner 角色 | 路径参数 + RoomMember 角色 | 200 / 400 / 403 / 404 |");
   precheck.push("| POST | /api/v1/rooms/:roomId/lock | 需 access token + 房间 owner 角色 | RoomMember 角色 | 200 / 400 / 403 / 404 |");
   precheck.push("| POST | /api/v1/rooms/:roomId/end | 需 access token + 房间 owner 角色 | RoomMember 角色 | 200 / 400 / 403 / 404 |");
+  precheck.push("| POST | /api/v1/ai/compose | 需 access token（Bearer） | zod composeSchema（instruction 1-500、roomId、bpm） | 200 / 400 / 401 |");
+  precheck.push("| GET | /api/v1/ai/compose/:jobId | 需 access token（Bearer） | 路径 jobId | 200 / 401 / 404 |");
+  precheck.push("| POST | /api/v1/ai/ask | 需 access token（Bearer） | zod askSchema（question 1-500） | 200 / 400 / 401 / 503 |");
+  precheck.push("| POST | /api/v1/ai/check | 需 access token（Bearer） | zod checkSchema（tracks 数组） | 200 / 400 / 401 |");
+  precheck.push("| POST | /api/v1/ai/fix | 需 access token（Bearer） | zod fixSchema（tracks 含 color、issues、roomId） | 200 / 400 / 401 |");
+  precheck.push("| GET | /api/v1/ai/fix/:jobId | 需 access token（Bearer） | 路径 jobId | 200 / 401 / 404 |");
   precheck.push("| * | 未匹配路径 | 无 | - | 404 |");
   precheck.push("");
   precheck.push("## 身份与数据");

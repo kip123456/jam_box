@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../lib/prisma";
-import { getHandler, JobHandler } from "./handlers";
+import { getHandler, JobHandler, registerAll } from "./handlers";
 
 const POLL_INTERVAL_MS = 2000;
 const TASK_TIMEOUT_MS = 120_000;
@@ -126,6 +126,8 @@ async function scanPending(): Promise<void> {
 async function main(): Promise<void> {
   await prisma.$connect();
   console.log("[worker] database connected");
+
+  registerAll();
 
   // 进程重启恢复：running 状态的任务重置为 pending 重新执行
   const recovered = await prisma.job.updateMany({

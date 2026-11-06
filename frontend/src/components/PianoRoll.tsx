@@ -48,8 +48,14 @@ export function PianoRoll() {
   const addNote = useRoomEditorStore((state) => state.addNote);
   const updateNotes = useRoomEditorStore((state) => state.updateNotes);
   const deleteNotes = useRoomEditorStore((state) => state.deleteNotes);
+  const previewTracks = useRoomEditorStore((state) => state.previewTracks);
 
   const track = tracks.find((item) => item.id === selectedTrackId) ?? null;
+  // AI 预览：修复预览（带轨道 id）只在对应轨道选中时显示；编曲预览（新轨道）始终叠加显示
+  const visiblePreview = (previewTracks ?? []).filter((item) =>
+    item.id ? item.id === selectedTrackId : true
+  );
+  const hasPreview = visiblePreview.length > 0;
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [drag, setDrag] = useState<DragState | null>(null);
   const [error, setError] = useState("");
@@ -169,7 +175,7 @@ export function PianoRoll() {
     }).catch((err) => setError(err instanceof Error ? err.message : "添加音符失败"));
   }
 
-  if (!track) {
+  if (!track && !hasPreview) {
     return (
       <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed bg-card text-sm text-muted-foreground">
         先在左侧添加或选择一条轨道，然后在钢琴卷帘上点击添加音符。
@@ -181,7 +187,7 @@ export function PianoRoll() {
     <div className="flex flex-1 flex-col gap-2">
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium">
-          {track.name} · MIDI 音高 {PITCH_MIN}-{PITCH_MAX}
+          {track ? `${track.name} · MIDI 音高 ${PITCH_MIN}-${PITCH_MAX}` : "AI 预览"}
         </span>
         <span className="text-xs text-muted-foreground">
           点击空白添加音符，拖动移动，选中后按 Delete 删除
@@ -265,7 +271,7 @@ export function PianoRoll() {
                 />
               ))}
 
-              {track.notes.map((note) => {
+              {(track?.notes ?? []).map((note) => {
                 const active = drag?.id === note.id;
                 const pitch = active ? drag!.pitch : note.pitch;
                 const ticks = active ? drag!.ticks : note.startTimeTicks;
@@ -287,12 +293,32 @@ export function PianoRoll() {
                       top: (PITCH_MAX - pitch) * CELL_HEIGHT,
                       width: Math.max(note.durationTicks * PX_PER_TICK - 1, 4),
                       height: CELL_HEIGHT - 1,
-                      backgroundColor: track.color,
+                      backgroundColor: track?.color,
                     }}
                     title={`${noteName(pitch)} · 第 ${(ticks / TICKS_PER_BEAT).toFixed(2)} 拍`}
                   />
                 );
               })}
+
+              {visiblePreview.flatMap((previewTrack, trackIndex) =>
+                previewTrack.notes.map((note, noteIndex) => {
+                  const pitch = clamp(note.pitch, PITCH_MIN, PITCH_MAX);
+                  return (
+                    <div
+                      key={`preview-${trackIndex}-${noteIndex}`}
+                      className="pointer-events-none absolute rounded-sm border border-dashed border-black/40 opacity-50"
+                      style={{
+                        left: note.startTimeTicks * PX_PER_TICK,
+                        top: (PITCH_MAX - pitch) * CELL_HEIGHT,
+                        width: Math.max(note.durationTicks * PX_PER_TICK - 1, 4),
+                        height: CELL_HEIGHT - 1,
+                        backgroundColor: previewTrack.color,
+                      }}
+                      title={`预览 · ${previewTrack.name}`}
+                    />
+                  );
+                })
+              )}
 
               <div
                 className="pointer-events-none absolute bottom-0 top-0 z-20 w-px bg-destructive"
