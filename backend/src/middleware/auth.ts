@@ -66,6 +66,23 @@ export function authenticateAccessToken(
   authenticate(req, res, next, readBearerToken(req), "access");
 }
 
+/**
+ * 可选登录中间件：带合法 access token 时注入 req.user，否则按匿名请求继续。
+ * 供公开但需按身份增强返回内容的接口使用（如房间详情）。
+ */
+export function optionalAuthenticateAccessToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  const token = readBearerToken(req);
+  if (!token) {
+    next();
+    return;
+  }
+  authenticate(req, res, next, token, "access");
+}
+
 /** refresh 中间件：仅接受 refresh token（优先 Authorization header，其次请求体 refreshToken） */
 export function authenticateRefreshToken(
   req: Request,
