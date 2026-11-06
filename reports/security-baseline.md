@@ -35,8 +35,103 @@ npm audit --omit=dev --json --registry=https://registry.npmjs.org
 输出原文：
 
 ```text
-(无输出)
-exit code: null
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@prisma/config": {
+      "name": "@prisma/config",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "deepmerge-ts"
+      ],
+      "effects": [
+        "prisma"
+      ],
+      "range": "6.13.0-dev.1 - 7.10.0 || 8.1.0-dev.1 - 8.1.0-dev.4",
+      "nodes": [
+        "node_modules/@prisma/config"
+      ],
+      "fixAvailable": {
+        "name": "prisma",
+        "version": "7.10.1",
+        "isSemVerMajor": true
+      }
+    },
+    "deepmerge-ts": {
+      "name": "deepmerge-ts",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1145093,
+          "name": "deepmerge-ts",
+          "dependency": "deepmerge-ts",
+          "title": "DeepmergeTS has stack exhaustion when merging recursive object graphs",
+          "url": "https://github.com/advisories/GHSA-ggr8-5vv4-36mx",
+          "severity": "high",
+          "cwe": [
+            "CWE-674"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<8.0.0"
+        }
+      ],
+      "effects": [
+        "@prisma/config"
+      ],
+      "range": "<8.0.0",
+      "nodes": [
+        "node_modules/deepmerge-ts"
+      ],
+      "fixAvailable": {
+        "name": "prisma",
+        "version": "7.10.1",
+        "isSemVerMajor": true
+      }
+    },
+    "prisma": {
+      "name": "prisma",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@prisma/config"
+      ],
+      "effects": [],
+      "range": "6.13.0-dev.1 - 7.10.0 || 8.0.0-rc.3 - 8.1.0-dev.4",
+      "nodes": [
+        "node_modules/prisma"
+      ],
+      "fixAvailable": {
+        "name": "prisma",
+        "version": "7.10.1",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 3,
+      "critical": 0,
+      "total": 3
+    },
+    "dependencies": {
+      "prod": 186,
+      "dev": 74,
+      "optional": 1,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 259
+    }
+  }
+}
+exit code: 1
 ```
 
 ## 3. 依赖审计（根级测试依赖）
@@ -75,6 +170,6 @@ exit code: 0
 
 ## 4. 审计结论
 
-- backend 生产依赖：审计命令未产出可解析 JSON（exit code null）
+- backend 生产依赖：info 0 / low 0 / moderate 0 / high 3 / critical 0（共 3）
 - 根级测试依赖：info 0 / low 0 / moderate 0 / high 0 / critical 0（共 0）
 - 处置说明：prisma 6.x 依赖链中的 deepmerge-ts 高危（GHSA-ggr8-5vv4-36mx）修复需升级到 prisma 7 major，而当前 SQLite datasource 写法与 prisma 7 不兼容，先记录为已知风险，后续单独升级验证，不阻塞本次测试补课。

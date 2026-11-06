@@ -144,6 +144,8 @@ interface RoomEditorState {
   previewTracks: PreviewTrack[] | null;
 
   loadRoom: (roomId: string) => Promise<void>;
+  /** 从 REST 加载的初始 tracks（供 Yjs 初始化使用，不直接设置到 store） */
+  restTracks: Track[];
   reset: () => void;
   selectTrack: (trackId: string | null) => void;
   setPreviewTracks: (tracks: PreviewTrack[] | null) => void;
@@ -180,15 +182,17 @@ export const useRoomEditorStore = create<RoomEditorState>((set, get) => ({
   past: [],
   future: [],
   previewTracks: null,
+  restTracks: [],
 
   loadRoom: async (roomId) => {
     set({ loading: true, error: "", roomId });
     try {
       const room = await editorApi.getRoomDetail(roomId);
+      // 保存 REST tracks 供 Yjs 初始化使用，但不直接设置到 store
+      // tracks 由 Yjs 驱动，避免 REST 数据覆盖 Yjs 恢复的数据
       set({
         room,
-        tracks: room.tracks,
-        selectedTrackId: room.tracks[0]?.id ?? null,
+        restTracks: room.tracks,
         loading: false,
         past: [],
         future: [],
@@ -197,12 +201,14 @@ export const useRoomEditorStore = create<RoomEditorState>((set, get) => ({
         loopEndTicks: DEFAULT_TOTAL_BEATS * TICKS_PER_BEAT,
         previewTracks: null,
       });
+      console.log(`[loadRoom] room metadata loaded, restTracks: ${room.tracks.length} tracks`);
     } catch (err) {
       set({
         loading: false,
         error: err instanceof Error ? err.message : "加载房间失败",
         room: null,
         tracks: [],
+        restTracks: [],
       });
     }
   },
@@ -223,6 +229,7 @@ export const useRoomEditorStore = create<RoomEditorState>((set, get) => ({
       past: [],
       future: [],
       previewTracks: null,
+      restTracks: [],
     }),
 
   selectTrack: (trackId) => set({ selectedTrackId: trackId }),

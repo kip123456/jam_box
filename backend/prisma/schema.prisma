@@ -122,3 +122,10 @@ model Note {
 
   @@index([trackId])
 }
+
+/** Yjs CRDT 文档持久化（每个房间一份） */
+model YjsDoc {
+  id        String   @id // 等于 roomId
+  ydoc      Bytes    // Uint8Array, Y.encodeStateAsUpdate(doc) 结果
+  updatedAt DateTime @updatedAt
+}

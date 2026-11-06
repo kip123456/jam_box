@@ -31,11 +31,15 @@ export default function Login() {
         password,
       })) as unknown as LoginResult;
 
-      useUserStore.setState({
-        token: data.accessToken,
-        refreshToken: data.refreshToken,
-        user: data.user,
-      });
+      // 使用 setToken 和 setUser 方法，确保同时写入 localStorage
+      useUserStore.getState().setToken(data.accessToken);
+      useUserStore.getState().setUser(data.user);
+      // 手动设置 refreshToken（setToken 不处理 refreshToken）
+      useUserStore.setState({ refreshToken: data.refreshToken });
+      // 写入 localStorage
+      localStorage.setItem("jam_token", data.accessToken);
+      localStorage.setItem("jam_refresh_token", data.refreshToken);
+      localStorage.setItem("jam_user", JSON.stringify(data.user));
       navigate("/rooms");
     } catch (err) {
       setError(err instanceof Error ? err.message : "登录失败，请稍后重试");

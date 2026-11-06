@@ -2,6 +2,8 @@ import "./utils/env";
 import path from "path";
 import fs from "fs";
 import express, { type Express } from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import { fork } from "child_process";
 import { applySecurityMiddleware } from "./middleware/cors-helmet";
 import { responseMiddleware } from "./middleware/response";
@@ -18,6 +20,8 @@ import { requireRoomMember, requireTrackAccess } from "./middleware/roomMember";
 import { config } from "./utils/env";
 import prisma from "./lib/prisma";
 import { BusinessError } from "./lib/errors";
+import { setupSocketIO } from "./socket";
+import { flushAllPendingSaves } from "./lib/yjs";
 
 /** 组装 Express 应用（不监听端口，供测试与运行时复用） */
 export function createApp(): Express {
@@ -85,13 +89,37 @@ async function start(): Promise<void> {
   console.log("[backend] database connected");
 
   const app = createApp();
-  app.listen(config.backendPort, () => {
+
+  // Express + Socket.IO 复用同一个 HTTP server
+  const httpServer = createServer(app);
+
+  const io = new Server(httpServer, {
+    cors: {
+      origin: config.frontendOrigin,
+      credentials: true,
+    },
+  });
+
+  setupSocketIO(io);
+
+  httpServer.listen(config.backendPort, () => {
     console.log(`[backend] listening on port ${config.backendPort}`);
     startWorker();
   });
 }
 
 const isEntryPoint = typeof require !== "undefined" && require.main === module;
+
+// 进程退出前强制保存所有待保存的 Yjs 文档
+async function gracefulShutdown(signal: string): Promise<void> {
+  console.log(`[backend] received ${signal}, flushing pending Yjs saves...`);
+  await flushAllPendingSaves();
+  await prisma.$disconnect().catch(() => undefined);
+  process.exit(0);
+}
+
+process.on("SIGINT", () => void gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => void gracefulShutdown("SIGTERM"));
 
 if (isEntryPoint) {
   start().catch(async (err) => {
