@@ -37,11 +37,54 @@ export const COLLAB_EVENTS = {
 } as const;
 
 /**
+ * WebRTC 信令事件名（必须和前端 `frontend/src/lib/webrtc.ts` 一致）
+ */
+export const WEBRTC_EVENTS = {
+  /** offer / answer / ICE candidate 转发 */
+  SIGNAL: "webrtc:signal",
+  /** 客户端加入语音通道 */
+  JOIN: "webrtc:join",
+  /** 通知房间内其他人：有新成员加入语音通道 */
+  JOINED: "webrtc:joined",
+  /** 客户端离开语音通道 */
+  LEAVE: "webrtc:leave",
+  /** 通知房间内其他人：有成员离开语音通道 */
+  LEFT: "webrtc:left",
+  /** 客户端请求当前语音通道成员列表 */
+  VOICE_LIST: "webrtc:voice-list",
+  /** 服务端返回当前语音通道成员列表 */
+  VOICE_MEMBERS: "webrtc:voice-members",
+  /** 成员静音 / 取消静音广播 */
+  MUTED: "member:muted",
+  UNMUTED: "member:unmuted",
+} as const;
+
+/**
  * 成员列表条目（发给前端的完整信息）
  */
 export interface OnlineMember {
   userId: string;
   username: string;
+}
+
+/** 语音通道成员（服务端记录静音状态） */
+export interface VoiceMember {
+  userId: string;
+  username: string;
+  muted: boolean;
+}
+
+/** 语音通道成员（带 socketId，供 WebRTC 点对点信令寻址） */
+export interface VoiceMemberEvent extends VoiceMember {
+  socketId: string;
+}
+
+/** 客户端发来的信令消息体 */
+export interface WebrtcSignalPayload {
+  to: string;
+  signal:
+    | { type: "offer" | "answer"; sdp: string }
+    | { type: "ice"; candidate: RTCIceCandidateInit };
 }
 
 /**
@@ -51,6 +94,8 @@ export interface OnlineMember {
 const connectedMembers = new Map<string, Map<string, OnlineMember>>();
 /** 反向索引：socketId -> roomId */
 const socketToRoom = new Map<string, string>();
+/** 语音通道成员：roomId -> Map<socketId, VoiceMember> */
+const voiceMembers = new Map<string, Map<string, VoiceMember>>();
 
 /**
  * 初始化 Socket.IO server，挂载：
@@ -188,6 +233,80 @@ export function setupSocketIO(io: Server): void {
     // 通知其他成员有人上线
     socket.to(`room:${roomId}`).emit(COLLAB_EVENTS.MEMBER_ONLINE, { userId, username });
 
+    // ---------- WebRTC 信令（复用 /collab namespace 与房间鉴权） ----------
+    const emitVoiceMembers = () => {
+      const voice = voiceMembers.get(roomId);
+      const members: VoiceMemberEvent[] = voice
+        ? Array.from(voice.entries()).map(([id, member]) => ({ socketId: id, ...member }))
+        : [];
+      socket.emit(WEBRTC_EVENTS.VOICE_MEMBERS, members);
+    };
+
+    // 加入语音通道：登记成员并通知房间内其他人
+    socket.on(WEBRTC_EVENTS.JOIN, () => {
+      if (!voiceMembers.has(roomId)) {
+        voiceMembers.set(roomId, new Map());
+      }
+      const voice = voiceMembers.get(roomId)!;
+      if (!voice.has(socketId)) {
+        voice.set(socketId, { userId, username, muted: false });
+        socket.broadcast.to(`room:${roomId}`).emit(WEBRTC_EVENTS.JOINED, {
+          socketId,
+          userId,
+          username,
+          muted: false,
+        });
+      }
+      // 把当前语音成员（含自己）回给加入者，前端会过滤掉自己
+      emitVoiceMembers();
+    });
+
+    // 查询当前语音成员（未加入语音的成员也能看到麦克风状态）
+    socket.on(WEBRTC_EVENTS.VOICE_LIST, emitVoiceMembers);
+
+    // 离开语音通道
+    socket.on(WEBRTC_EVENTS.LEAVE, () => {
+      const voice = voiceMembers.get(roomId);
+      if (!voice || !voice.has(socketId)) return;
+      voice.delete(socketId);
+      socket.broadcast.to(`room:${roomId}`).emit(WEBRTC_EVENTS.LEFT, { socketId, userId });
+      if (voice.size === 0) voiceMembers.delete(roomId);
+    });
+
+    // offer/answer/ICE 转发：只允许发给同一房间内的已连接成员
+    socket.on(WEBRTC_EVENTS.SIGNAL, (payload: unknown) => {
+      if (!isValidWebrtcSignal(payload)) return;
+      if (payload.to === socketId) return;
+      if (socketToRoom.get(payload.to) !== roomId) return;
+
+      socket.to(payload.to).emit(WEBRTC_EVENTS.SIGNAL, {
+        to: payload.to,
+        from: socketId,
+        fromUserId: userId,
+        fromUsername: username,
+        signal: payload.signal,
+      });
+    });
+
+    // 静音状态广播（服务端同时记录，供后加入者查询）
+    socket.on(WEBRTC_EVENTS.MUTED, () => {
+      const member = voiceMembers.get(roomId)?.get(socketId);
+      if (!member) return;
+      member.muted = true;
+      socket.broadcast
+        .to(`room:${roomId}`)
+        .emit(WEBRTC_EVENTS.MUTED, { socketId, userId });
+    });
+
+    socket.on(WEBRTC_EVENTS.UNMUTED, () => {
+      const member = voiceMembers.get(roomId)?.get(socketId);
+      if (!member) return;
+      member.muted = false;
+      socket.broadcast
+        .to(`room:${roomId}`)
+        .emit(WEBRTC_EVENTS.UNMUTED, { socketId, userId });
+    });
+
     socket.on("disconnect", (reason) => {
       const socketRoom = socketToRoom.get(socketId);
       if (!socketRoom) return;
@@ -200,6 +319,18 @@ export function setupSocketIO(io: Server): void {
 
         if (leaving) {
           console.log(`[socket.io] /collab disconnected: ${leaving.username}(${leaving.userId}) from ${socketRoom} (${reason})`);
+
+          // 断线时若还在语音通道，自动清理并通知其他人关闭 PeerConnection
+          const voice = voiceMembers.get(socketRoom);
+          if (voice?.has(socketId)) {
+            voice.delete(socketId);
+            collabNs.to(`room:${socketRoom}`).emit(WEBRTC_EVENTS.LEFT, {
+              socketId,
+              userId: leaving.userId,
+            });
+            if (voice.size === 0) voiceMembers.delete(socketRoom);
+          }
+
           // 通知其他成员有人离线
           collabNs.to(`room:${socketRoom}`).emit(COLLAB_EVENTS.MEMBER_OFFLINE, { userId: leaving.userId });
         }
@@ -252,5 +383,34 @@ export function getOnlineMembers(roomId: string): OnlineMember[] {
   return Array.from(map.values());
 }
 
+/**
+ * 校验客户端信令结构，防止畸形数据被转发到房间内其他成员。
+ */
+function isValidWebrtcSignal(payload: unknown): payload is WebrtcSignalPayload {
+  if (!payload || typeof payload !== "object") return false;
+  const data = payload as Record<string, unknown>;
+  if (typeof data.to !== "string" || data.to.length === 0) return false;
+
+  const signal = data.signal as Record<string, unknown> | undefined;
+  if (!signal || typeof signal !== "object") return false;
+
+  if (signal.type === "offer" || signal.type === "answer") {
+    return typeof signal.sdp === "string" && signal.sdp.length > 0;
+  }
+  if (signal.type === "ice") {
+    return typeof signal.candidate === "object" && signal.candidate !== null;
+  }
+  return false;
+}
+
+/**
+ * （工具函数）获取某个房间当前语音通道成员列表（供测试或非 Socket.IO 上下文使用）。
+ */
+export function getVoiceMembers(roomId: string): VoiceMemberEvent[] {
+  const voice = voiceMembers.get(roomId);
+  if (!voice) return [];
+  return Array.from(voice.entries()).map(([id, member]) => ({ socketId: id, ...member }));
+}
+
 // 导出给其他模块使用
-export { connectedMembers, socketToRoom };
+export { connectedMembers, socketToRoom, voiceMembers };

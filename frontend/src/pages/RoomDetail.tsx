@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Sparkles, Users } from "lucide-react";
+import { Mic, MicOff, Sparkles, Users } from "lucide-react";
 import { PlayControls } from "@/components/PlayControls";
 import { TrackList } from "@/components/TrackList";
 import { PianoRoll } from "@/components/PianoRoll";
@@ -14,7 +14,9 @@ import {
 } from "@/components/ui/resizable";
 import { useRoomEditorStore } from "@/store/roomEditor";
 import { useCollabStore } from "@/store/collab";
+import { useUserStore } from "@/store/user";
 import { useYjsRoom } from "@/hooks/useYjsRoom";
+import { MicrophoneError, WebRTCManager, type VoiceState } from "@/lib/webrtc";
 import * as audio from "@/lib/audio";
 
 export default function RoomDetail() {
@@ -39,6 +41,68 @@ export default function RoomDetail() {
   const aiPanelRef = usePanelRef();
   const [aiCollapsed, setAiCollapsed] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
+
+  // 语音通话状态
+  const token = useUserStore((s) => s.token);
+  const currentUser = useUserStore((s) => s.user);
+  const [voiceState, setVoiceState] = useState<VoiceState>({
+    joined: false,
+    muted: false,
+    peers: [],
+  });
+  const [toast, setToast] = useState<string | null>(null);
+  const webrtcRef = useRef<WebRTCManager | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
+
+  function showToast(message: string) {
+    setToast(message);
+    if (toastTimerRef.current !== null) {
+      window.clearTimeout(toastTimerRef.current);
+    }
+    toastTimerRef.current = window.setTimeout(() => {
+      setToast(null);
+      toastTimerRef.current = null;
+    }, 3000);
+  }
+
+  // 创建/销毁 WebRTC 管理器（复用 /collab Socket.IO 连接）
+  useEffect(() => {
+    if (!roomId || !token) return;
+
+    const manager = new WebRTCManager(roomId, setVoiceState);
+    webrtcRef.current = manager;
+
+    return () => {
+      webrtcRef.current = null;
+      void manager.destroy();
+      if (toastTimerRef.current !== null) {
+        window.clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = null;
+      }
+    };
+  }, [roomId, token]);
+
+  async function handleVoiceButton() {
+    const manager = webrtcRef.current;
+    if (!manager) return;
+
+    if (voiceState.joined) {
+      await manager.leave();
+      return;
+    }
+
+    try {
+      await manager.join();
+    } catch (err) {
+      showToast(
+        err instanceof MicrophoneError ? err.message : "无法打开麦克风，请稍后重试"
+      );
+    }
+  }
+
+  function handleToggleMute() {
+    webrtcRef.current?.toggleMute();
+  }
 
   function toggleAiPanel() {
     const panel = aiPanelRef.current;
@@ -96,6 +160,10 @@ export default function RoomDetail() {
           ? "bg-red-500"
           : "bg-gray-400";
 
+  const voicePeerByUserId = new Map(
+    voiceState.peers.map((peer) => [peer.userId, peer])
+  );
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="mx-auto flex max-w-[1400px] flex-col gap-4">
@@ -138,6 +206,23 @@ export default function RoomDetail() {
               <Users className="h-3 w-3" />
               <span>{onlineMembers.length} 人在线</span>
             </button>
+            <Button
+              variant={voiceState.joined ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => void handleVoiceButton()}
+            >
+              {voiceState.joined ? (
+                <>
+                  <MicOff className="h-4 w-4" />
+                  关闭麦克风
+                </>
+              ) : (
+                <>
+                  <Mic className="h-4 w-4" />
+                  打开麦克风
+                </>
+              )}
+            </Button>
             <p className="text-xs text-muted-foreground">
               Ctrl+Z 撤销 · Ctrl+Shift+Z / Ctrl+Y 重做 · 空格播放/暂停 · Delete 删除音符
             </p>
@@ -164,15 +249,61 @@ export default function RoomDetail() {
               <p className="text-xs text-muted-foreground">暂无在线成员</p>
             ) : (
               <ul className="flex flex-wrap gap-2">
-                {onlineMembers.map((m) => (
-                  <li
-                    key={m.userId}
-                    className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                    {m.username}
-                  </li>
-                ))}
+                {onlineMembers.map((m) => {
+                  const isSelf = m.userId === currentUser?.id;
+                  const peer = voicePeerByUserId.get(m.userId);
+                  const inVoice = isSelf ? voiceState.joined : Boolean(peer);
+                  const muted = isSelf ? voiceState.muted : Boolean(peer?.muted);
+                  const speaking = Boolean(peer?.speaking);
+
+                  if (!inVoice) {
+                    return (
+                      <li
+                        key={m.userId}
+                        className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                        {m.username}
+                      </li>
+                    );
+                  }
+
+                  const micIcon = muted ? (
+                    <MicOff className="h-3.5 w-3.5 text-muted-foreground" />
+                  ) : (
+                    <Mic
+                      className={`h-3.5 w-3.5 ${
+                        speaking ? "text-green-600" : "text-foreground"
+                      }`}
+                    />
+                  );
+
+                  return (
+                    <li
+                      key={m.userId}
+                      className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs transition-colors ${
+                        speaking
+                          ? "bg-green-500/20 ring-1 ring-green-500"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      {m.username}
+                      {isSelf ? (
+                        <button
+                          type="button"
+                          onClick={handleToggleMute}
+                          title={muted ? "取消静音" : "静音"}
+                          className="ml-0.5 rounded p-0.5 hover:bg-background/60"
+                        >
+                          {micIcon}
+                        </button>
+                      ) : (
+                        micIcon
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
@@ -180,6 +311,15 @@ export default function RoomDetail() {
 
         {(error || actionError) && (
           <p className="text-sm text-destructive">{error || actionError}</p>
+        )}
+
+        {toast && (
+          <div
+            role="status"
+            className="fixed bottom-6 right-6 z-50 max-w-sm rounded-md border border-destructive bg-background px-4 py-2 text-sm text-destructive shadow-lg"
+          >
+            {toast}
+          </div>
         )}
 
         {loading && !room ? (

@@ -27,7 +27,7 @@ const RECONNECT_CONFIG = {
  */
 export function getCollabSocket(roomId: string): Socket {
   const existing = collabSockets.get(roomId);
-  if (existing && existing.connected) return existing;
+  if (existing) return existing;
 
   const token = useUserStore.getState().token;
   const baseUrl = getSocketBaseUrl();

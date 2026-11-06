@@ -53,6 +53,21 @@ function makeTrack(notes: AnyRecord[] = []) {
 
 const ADD_INPUT = { pitch: 60, startTimeTicks: 0, durationTicks: 480, velocity: 100 };
 
+/**
+ * 生产环境中 tracks 由 Yjs 同步写入 store（loadRoom 只保存 restTracks 供 Yjs 初始化）。
+ * 单测里没有 Yjs，需要手动模拟 Yjs 初始同步后的 tracks。
+ */
+function applyRestTracksToStore() {
+  const restTracks = useRoomEditorStore.getState().restTracks;
+  useRoomEditorStore.setState({
+    tracks: restTracks.map((track) => ({
+      ...track,
+      notes: track.notes.map((note) => ({ ...note })),
+    })),
+    selectedTrackId: restTracks[0]?.id ?? null,
+  });
+}
+
 beforeEach(async () => {
   vi.clearAllMocks();
   api = (await vi.importMock("@/api/editor")) as unknown as Record<
@@ -67,6 +82,7 @@ beforeEach(async () => {
     tracks: [makeTrack()],
   });
   await useRoomEditorStore.getState().loadRoom("room_1");
+  applyRestTracksToStore();
 });
 
 describe("roomEditorStore 音符编辑与撤销/重做", () => {
@@ -130,6 +146,7 @@ describe("roomEditorStore 音符编辑与撤销/重做", () => {
       tracks: [makeTrack([makeNote()])],
     });
     await useRoomEditorStore.getState().loadRoom("room_1");
+    applyRestTracksToStore();
 
     api.bulkDeleteNotes.mockResolvedValue({ deleted: 1 });
     await useRoomEditorStore.getState().deleteNotes("track_1", ["note_1"]);
