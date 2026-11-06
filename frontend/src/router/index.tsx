@@ -4,6 +4,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Rooms from "@/pages/Rooms";
 import RoomDetail from "@/pages/RoomDetail";
+import HistoryRoomsPage from "@/pages/HistoryRoomsPage";
 import NotFound from "@/pages/NotFound";
 
 /** 根路径按登录状态重定向 */
@@ -20,6 +21,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/rooms" element={<Rooms />} />
       <Route path="/rooms/:roomId" element={<RoomDetail />} />
+      <Route path="/history" element={<HistoryRoomsPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

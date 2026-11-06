@@ -13,7 +13,7 @@ import { INSTRUMENT_META, INSTRUMENT_TYPES, type InstrumentType } from "@/api/ed
 import { useRoomEditorStore } from "@/store/roomEditor";
 import { cn } from "@/lib/utils";
 
-export function TrackList() {
+export function TrackList({ readOnly = false }: { readOnly?: boolean }) {
   const tracks = useRoomEditorStore((state) => state.tracks);
   const selectedTrackId = useRoomEditorStore((state) => state.selectedTrackId);
   const selectTrack = useRoomEditorStore((state) => state.selectTrack);
@@ -49,7 +49,7 @@ export function TrackList() {
       <div className="flex flex-col gap-2">
         {tracks.length === 0 && (
           <p className="rounded border border-dashed p-3 text-xs text-muted-foreground">
-            还没有轨道，先在下方添加一个乐器。
+            {readOnly ? "该房间没有轨道。" : "还没有轨道，先在下方添加一个乐器。"}
           </p>
         )}
 
@@ -75,62 +75,72 @@ export function TrackList() {
                 <span aria-hidden className="text-lg">
                   {meta.icon}
                 </span>
-                <input
-                  key={`${track.id}-${track.name}`}
-                  defaultValue={track.name}
-                  aria-label="轨道名"
-                  className={cn(
-                    "min-w-0 flex-1 rounded border border-transparent bg-transparent px-1 py-0.5 text-sm font-medium",
-                    "focus:border-input focus:bg-background focus:outline-none"
-                  )}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") event.currentTarget.blur();
-                  }}
-                  onBlur={(event) => {
-                    const value = event.currentTarget.value;
-                    if (value.trim() && value.trim() !== track.name) {
-                      void run(() => renameTrack(track.id, value));
-                    }
-                  }}
-                />
+                {readOnly ? (
+                  <span className="min-w-0 flex-1 truncate px-1 py-0.5 text-sm font-medium">
+                    {track.name}
+                  </span>
+                ) : (
+                  <input
+                    key={`${track.id}-${track.name}`}
+                    defaultValue={track.name}
+                    aria-label="轨道名"
+                    className={cn(
+                      "min-w-0 flex-1 rounded border border-transparent bg-transparent px-1 py-0.5 text-sm font-medium",
+                      "focus:border-input focus:bg-background focus:outline-none"
+                    )}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") event.currentTarget.blur();
+                    }}
+                    onBlur={(event) => {
+                      const value = event.currentTarget.value;
+                      if (value.trim() && value.trim() !== track.name) {
+                        void run(() => renameTrack(track.id, value));
+                      }
+                    }}
+                  />
+                )}
                 <span
                   className="h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: track.color }}
                 />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                  aria-label={`删除轨道 ${track.name}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    if (window.confirm(`确定删除轨道「${track.name}」？轨道内音符会一并删除。`)) {
-                      void run(() => removeTrack(track.id));
-                    }
-                  }}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+                {!readOnly && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                    aria-label={`删除轨道 ${track.name}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (window.confirm(`确定删除轨道「${track.name}」？轨道内音符会一并删除。`)) {
+                        void run(() => removeTrack(track.id));
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                )}
               </div>
 
-              <div className="mt-2 flex items-center gap-4 pl-7">
-                <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <Switch
-                    checked={track.solo}
-                    onCheckedChange={() => void run(() => toggleTrackFlag(track.id, "solo"))}
-                    aria-label={`${track.name} solo`}
-                  />
-                  <span className={track.solo ? "font-semibold text-primary" : undefined}>SOLO</span>
-                </label>
-                <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <Switch
-                    checked={track.mute}
-                    onCheckedChange={() => void run(() => toggleTrackFlag(track.id, "mute"))}
-                    aria-label={`${track.name} mute`}
-                  />
-                  <span className={track.mute ? "font-semibold text-destructive" : undefined}>MUTE</span>
-                </label>
-              </div>
+              {!readOnly && (
+                <div className="mt-2 flex items-center gap-4 pl-7">
+                  <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <Switch
+                      checked={track.solo}
+                      onCheckedChange={() => void run(() => toggleTrackFlag(track.id, "solo"))}
+                      aria-label={`${track.name} solo`}
+                    />
+                    <span className={track.solo ? "font-semibold text-primary" : undefined}>SOLO</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <Switch
+                      checked={track.mute}
+                      onCheckedChange={() => void run(() => toggleTrackFlag(track.id, "mute"))}
+                      aria-label={`${track.name} mute`}
+                    />
+                    <span className={track.mute ? "font-semibold text-destructive" : undefined}>MUTE</span>
+                  </label>
+                </div>
+              )}
             </div>
           );
         })}
@@ -163,26 +173,28 @@ export function TrackList() {
 
       {error && <p className="text-xs text-destructive">{error}</p>}
 
-      <div className="mt-auto flex flex-col gap-2 border-t pt-3">
-        <Select
-          value={instrument}
-          onValueChange={(value) => setInstrument(value as InstrumentType)}
-        >
-          <SelectTrigger aria-label="选择乐器">
-            <SelectValue placeholder="选择乐器" />
-          </SelectTrigger>
-          <SelectContent>
-            {INSTRUMENT_TYPES.map((type) => (
-              <SelectItem key={type} value={type}>
-                {INSTRUMENT_META[type].icon} {INSTRUMENT_META[type].label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button disabled={busy} onClick={() => void run(() => addTrack(instrument))}>
-          + 添加轨道
-        </Button>
-      </div>
+      {!readOnly && (
+        <div className="mt-auto flex flex-col gap-2 border-t pt-3">
+          <Select
+            value={instrument}
+            onValueChange={(value) => setInstrument(value as InstrumentType)}
+          >
+            <SelectTrigger aria-label="选择乐器">
+              <SelectValue placeholder="选择乐器" />
+            </SelectTrigger>
+            <SelectContent>
+              {INSTRUMENT_TYPES.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {INSTRUMENT_META[type].icon} {INSTRUMENT_META[type].label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button disabled={busy} onClick={() => void run(() => addTrack(instrument))}>
+            + 添加轨道
+          </Button>
+        </div>
+      )}
     </aside>
   );
 }

@@ -33,6 +33,8 @@ export interface RoomDetail {
   name: string;
   isPublic: boolean;
   status: RoomStatus;
+  bpm: number;
+  endedAt: string | null;
   createdAt: string;
   updatedAt: string;
   owner: RoomOwner | null;
@@ -41,9 +43,32 @@ export interface RoomDetail {
   role?: MemberRole | null;
 }
 
+/** GET /rooms?status=ended 返回的“我的合奏”条目 */
+export interface EndedRoomSummary {
+  id: string;
+  code: string;
+  roomNumber: string;
+  name: string;
+  bpm: number;
+  status: RoomStatus;
+  endedAt: string | null;
+  isHost: boolean;
+  owner: RoomOwner;
+  trackCount: number;
+  memberCount: number;
+}
+
 /** GET /rooms：公开活跃房间列表 */
 export async function listRooms(): Promise<RoomSummary[]> {
   return (await client.get("/rooms")) as unknown as Promise<RoomSummary[]>;
+}
+
+/** GET /rooms?status=ended：当前用户参与过的已结束房间 */
+export async function listEndedRooms(): Promise<EndedRoomSummary[]> {
+  const data = (await client.get("/rooms", {
+    params: { status: "ended" },
+  })) as unknown as { rooms: EndedRoomSummary[] };
+  return data.rooms;
 }
 
 /** POST /rooms：创建房间 */

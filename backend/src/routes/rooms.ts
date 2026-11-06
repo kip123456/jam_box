@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { Prisma, MemberRole, RoomStatus } from "@prisma/client";
 import prisma from "../lib/prisma";
-import { BusinessError, ValidationError } from "../lib/errors";
+import { BusinessError, ValidationError, AuthError } from "../lib/errors";
 import { hashPassword, comparePassword } from "../lib/auth";
 import { createRoomSchema, joinRoomSchema } from "../zod/room";
 import {
@@ -54,35 +54,79 @@ router.post("/", authenticateAccessToken, async (req: Request, res: Response, ne
   }
 });
 
-/** 公开房间列表：无需登录，最多 20 条 active 公开房间，按创建时间倒序 */
-router.get("/", async (_req: Request, res: Response, next: NextFunction) => {
-  try {
-    const rooms = await prisma.room.findMany({
-      where: { isPublic: true, status: RoomStatus.active },
-      take: 20,
-      orderBy: { createdAt: "desc" },
-      include: {
-        owner: { select: { id: true, username: true } },
-        _count: { select: { members: true } },
-      },
-    });
+/**
+ * 房间列表：
+ * - `?status=ended`：当前用户作为成员的已结束房间（需登录）
+ * - 默认：最多 20 条 active 公开房间，按创建时间倒序
+ */
+router.get(
+  "/",
+  optionalAuthenticateAccessToken,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (req.query.status === "ended") {
+        if (!req.user) {
+          throw new AuthError("未登录");
+        }
 
-    res.json(
-      rooms.map((room) => ({
-        id: room.id,
-        roomNumber: room.roomNumber,
-        name: room.name,
-        isPublic: room.isPublic,
-        status: room.status,
-        createdAt: room.createdAt,
-        owner: { id: room.owner.id, username: room.owner.username },
-        memberCount: room._count.members,
-      }))
-    );
-  } catch (err) {
-    next(err);
+        const userId = req.user.id;
+        const rooms = await prisma.room.findMany({
+          where: {
+            status: RoomStatus.ended,
+            members: { some: { userId } },
+          },
+          orderBy: [{ endedAt: "desc" }, { updatedAt: "desc" }],
+          include: {
+            owner: { select: { id: true, username: true } },
+            _count: { select: { members: true, tracks: true } },
+          },
+        });
+
+        res.json({
+          rooms: rooms.map((room) => ({
+            id: room.id,
+            code: room.roomNumber,
+            roomNumber: room.roomNumber,
+            name: room.name,
+            bpm: room.bpm,
+            status: room.status,
+            endedAt: room.endedAt,
+            isHost: room.ownerId === userId,
+            owner: { id: room.owner.id, username: room.owner.username },
+            trackCount: room._count.tracks,
+            memberCount: room._count.members,
+          })),
+        });
+        return;
+      }
+
+      const rooms = await prisma.room.findMany({
+        where: { isPublic: true, status: RoomStatus.active },
+        take: 20,
+        orderBy: { createdAt: "desc" },
+        include: {
+          owner: { select: { id: true, username: true } },
+          _count: { select: { members: true } },
+        },
+      });
+
+      res.json(
+        rooms.map((room) => ({
+          id: room.id,
+          roomNumber: room.roomNumber,
+          name: room.name,
+          isPublic: room.isPublic,
+          status: room.status,
+          createdAt: room.createdAt,
+          owner: { id: room.owner.id, username: room.owner.username },
+          memberCount: room._count.members,
+        }))
+      );
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 /** 房间详情：可选登录，成员额外获得 isMember / role */
 router.get(
@@ -250,7 +294,7 @@ router.post(
 
       const updated = await prisma.room.update({
         where: { id: req.room!.id },
-        data: { status: RoomStatus.ended },
+        data: { status: RoomStatus.ended, endedAt: new Date() },
         include: roomInclude,
       });
 

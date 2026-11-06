@@ -28,5 +28,8 @@ export function registerAll(): void {
   const { composeHandler, fixHandler } = require("./handlers/aiHandlers") as typeof import("./handlers/aiHandlers");
   registerHandler("ai-compose", composeHandler);
   registerHandler("ai-fix", fixHandler);
+
+  const { exportHandler } = require("./handlers/exportHandler") as typeof import("./handlers/exportHandler");
+  registerHandler("export-audio", exportHandler);
   console.log(`[worker] registered handlers: ${getRegisteredTypes().join(", ")}`);
 }

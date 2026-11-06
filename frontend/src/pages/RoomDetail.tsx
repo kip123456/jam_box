@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Mic, MicOff, Sparkles, Users } from "lucide-react";
+import { Download, Mic, MicOff, Share2, Sparkles, Users } from "lucide-react";
 import { PlayControls } from "@/components/PlayControls";
 import { TrackList } from "@/components/TrackList";
 import { PianoRoll } from "@/components/PianoRoll";
@@ -17,6 +17,13 @@ import { useCollabStore } from "@/store/collab";
 import { useUserStore } from "@/store/user";
 import { useYjsRoom } from "@/hooks/useYjsRoom";
 import { MicrophoneError, WebRTCManager, type VoiceState } from "@/lib/webrtc";
+import {
+  buildExportFileUrl,
+  buildShareUrl,
+  createShareLink,
+  getExportJob,
+  submitExport,
+} from "@/api/export";
 import * as audio from "@/lib/audio";
 
 export default function RoomDetail() {
@@ -28,16 +35,25 @@ export default function RoomDetail() {
   const reset = useRoomEditorStore((state) => state.reset);
   const undo = useRoomEditorStore((state) => state.undo);
   const redo = useRoomEditorStore((state) => state.redo);
+  const bpm = useRoomEditorStore((state) => state.bpm);
+
+  // 已结束房间进入只读回放模式：不建立协同/语音连接
+  const isEnded = room?.status === "ended";
+  const readOnly = Boolean(isEnded);
 
   // 协同状态
   const onlineMembers = useCollabStore((s) => s.onlineMembers);
   const connectionStatus = useCollabStore((s) => s.connectionStatus);
   const yjsSynced = useCollabStore((s) => s.yjsSynced);
 
-  // 接入协同 hook（Socket.IO + Yjs）
-  const { yjsActions } = useYjsRoom(roomId ?? null);
+  // 接入协同 hook（Socket.IO + Yjs）；已结束房间不连接
+  const { yjsActions } = useYjsRoom(isEnded ? null : roomId ?? null);
 
   const [actionError, setActionError] = useState("");
+  const [exportStatus, setExportStatus] = useState<"idle" | "running" | "error">("idle");
+  const [exportMessage, setExportMessage] = useState("");
+  const [shareUrl, setShareUrl] = useState("");
+  const [shareBusy, setShareBusy] = useState(false);
   const aiPanelRef = usePanelRef();
   const [aiCollapsed, setAiCollapsed] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
@@ -67,7 +83,7 @@ export default function RoomDetail() {
 
   // 创建/销毁 WebRTC 管理器（复用 /collab Socket.IO 连接）
   useEffect(() => {
-    if (!roomId || !token) return;
+    if (!roomId || !token || isEnded) return;
 
     const manager = new WebRTCManager(roomId, setVoiceState);
     webrtcRef.current = manager;
@@ -80,7 +96,7 @@ export default function RoomDetail() {
         toastTimerRef.current = null;
       }
     };
-  }, [roomId, token]);
+  }, [roomId, token, isEnded]);
 
   async function handleVoiceButton() {
     const manager = webrtcRef.current;
@@ -102,6 +118,56 @@ export default function RoomDetail() {
 
   function handleToggleMute() {
     webrtcRef.current?.toggleMute();
+  }
+
+  /** 导出 MP3：提交任务 → 每 2 秒轮询直到完成，浏览器下载 */
+  async function handleExport() {
+    if (!room) return;
+    setExportStatus("running");
+    setExportMessage("正在导出音频，请稍候...");
+    try {
+      const { jobId } = await submitExport(room.id, { format: "mp3", bpm });
+      for (let attempt = 0; attempt < 60; attempt += 1) {
+        await new Promise((resolve) => window.setTimeout(resolve, 2000));
+        const job = await getExportJob(room.id, jobId);
+        if (job.status === "completed" && job.result) {
+          window.open(buildExportFileUrl(job.result.url), "_blank");
+          setExportStatus("idle");
+          setExportMessage(`导出完成（${job.result.format.toUpperCase()}）`);
+          return;
+        }
+        if (job.status === "failed") {
+          throw new Error(job.error ?? "导出失败");
+        }
+      }
+      throw new Error("导出超时，请稍后重试");
+    } catch (err) {
+      setExportStatus("error");
+      setExportMessage(err instanceof Error ? err.message : "导出失败");
+    }
+  }
+
+  async function handleShare() {
+    if (!room) return;
+    setShareBusy(true);
+    setActionError("");
+    try {
+      const { shareUrl: path } = await createShareLink(room.id);
+      setShareUrl(buildShareUrl(path));
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "生成分享链接失败");
+    } finally {
+      setShareBusy(false);
+    }
+  }
+
+  async function handleCopyShare() {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showToast("分享链接已复制");
+    } catch {
+      window.prompt("复制分享链接", shareUrl);
+    }
   }
 
   function toggleAiPanel() {
@@ -126,6 +192,8 @@ export default function RoomDetail() {
 
   // Ctrl+Z 撤销 / Ctrl+Shift+Z 或 Ctrl+Y 重做
   useEffect(() => {
+    if (isEnded) return;
+
     function onKeyDown(event: KeyboardEvent) {
       if (!(event.ctrlKey || event.metaKey)) return;
       const target = event.target as HTMLElement | null;
@@ -147,9 +215,9 @@ export default function RoomDetail() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [undo, redo]);
+  }, [undo, redo, isEnded]);
 
-  const isPrivateNonMember = room && !room.isPublic && !room.isMember;
+  const isPrivateNonMember = room && !room.isPublic && !room.isMember && !isEnded;
 
   const statusDotColor =
     connectionStatus === "connected"
@@ -169,8 +237,8 @@ export default function RoomDetail() {
       <div className="mx-auto flex max-w-[1400px] flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <Link className="text-sm underline underline-offset-4" to="/rooms">
-              ← 返回房间列表
+            <Link className="text-sm underline underline-offset-4" to={isEnded ? "/history" : "/rooms"}>
+              ← {isEnded ? "我的合奏" : "返回房间列表"}
             </Link>
             <h1 className="mt-2 text-2xl font-bold">
               {room ? room.name : "房间详情"}
@@ -179,68 +247,139 @@ export default function RoomDetail() {
                   {room.roomNumber}
                 </span>
               )}
+              {isEnded && (
+                <span className="ml-2 rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
+                  已结束
+                </span>
+              )}
             </h1>
-            {/* 协同状态指示 */}
-            <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-              <span className={`h-2 w-2 rounded-full ${statusDotColor}`} />
-              <span>
-                {connectionStatus === "connected"
-                  ? "已连接"
-                  : connectionStatus === "connecting"
-                    ? "连接中..."
-                    : connectionStatus === "error"
-                      ? "连接错误"
-                      : "未连接"}
-              </span>
-              {yjsSynced && connectionStatus === "connected" && (
-                <span className="text-green-600">· 实时协同就绪</span>
-              )}
-            </div>
+            {isEnded ? (
+              <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                <span>只读回放</span>
+                {room?.endedAt && (
+                  <span>· 结束于 {new Date(room.endedAt).toLocaleString("zh-CN")}</span>
+                )}
+              </div>
+            ) : (
+              <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                <span className={`h-2 w-2 rounded-full ${statusDotColor}`} />
+                <span>
+                  {connectionStatus === "connected"
+                    ? "已连接"
+                    : connectionStatus === "connecting"
+                      ? "连接中..."
+                      : connectionStatus === "error"
+                        ? "连接错误"
+                        : "未连接"}
+                </span>
+                {yjsSynced && connectionStatus === "connected" && (
+                  <span className="text-green-600">· 实时协同就绪</span>
+                )}
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowMembers((v) => !v)}
-              className="flex items-center gap-1 rounded-full border px-3 py-1 text-xs hover:bg-muted"
-              title="在线成员"
-            >
-              <Users className="h-3 w-3" />
-              <span>{onlineMembers.length} 人在线</span>
-            </button>
-            <Button
-              variant={voiceState.joined ? "secondary" : "outline"}
-              size="sm"
-              onClick={() => void handleVoiceButton()}
-            >
-              {voiceState.joined ? (
-                <>
-                  <MicOff className="h-4 w-4" />
-                  关闭麦克风
-                </>
-              ) : (
-                <>
-                  <Mic className="h-4 w-4" />
-                  打开麦克风
-                </>
-              )}
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              Ctrl+Z 撤销 · Ctrl+Shift+Z / Ctrl+Y 重做 · 空格播放/暂停 · Delete 删除音符
-            </p>
-            {room && room.isMember && (
-              <Button
-                variant={aiCollapsed ? "outline" : "secondary"}
-                size="sm"
-                onClick={toggleAiPanel}
-              >
-                <Sparkles className="h-4 w-4" />
-                AI 助手
-              </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            {!isEnded && (
+              <>
+                <button
+                  onClick={() => setShowMembers((v) => !v)}
+                  className="flex items-center gap-1 rounded-full border px-3 py-1 text-xs hover:bg-muted"
+                  title="在线成员"
+                >
+                  <Users className="h-3 w-3" />
+                  <span>{onlineMembers.length} 人在线</span>
+                </button>
+                <Button
+                  variant={voiceState.joined ? "secondary" : "outline"}
+                  size="sm"
+                  onClick={() => void handleVoiceButton()}
+                >
+                  {voiceState.joined ? (
+                    <>
+                      <MicOff className="h-4 w-4" />
+                      关闭麦克风
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="h-4 w-4" />
+                      打开麦克风
+                    </>
+                  )}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Ctrl+Z 撤销 · Ctrl+Shift+Z / Ctrl+Y 重做 · 空格播放/暂停 · Delete 删除音符
+                </p>
+                {room && room.isMember && (
+                  <Button
+                    variant={aiCollapsed ? "outline" : "secondary"}
+                    size="sm"
+                    onClick={toggleAiPanel}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    AI 助手
+                  </Button>
+                )}
+              </>
+            )}
+            {isEnded && room?.isMember && (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => void handleExport()}
+                  disabled={exportStatus === "running"}
+                >
+                  <Download className="h-4 w-4" />
+                  {exportStatus === "running" ? "导出中..." : "导出音频"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => void handleShare()}
+                  disabled={shareBusy}
+                >
+                  <Share2 className="h-4 w-4" />
+                  分享
+                </Button>
+              </>
+            )}
+            {isEnded && (
+              <p className="text-xs text-muted-foreground">空格键播放/暂停</p>
             )}
           </div>
         </div>
 
-        {/* 在线成员下拉面板 */}
-        {showMembers && (
+        {shareUrl && (
+          <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-3 text-sm">
+            <span className="text-xs text-muted-foreground">分享链接</span>
+            <input
+              readOnly
+              value={shareUrl}
+              aria-label="分享链接"
+              className="min-w-[240px] flex-1 rounded-md border border-input bg-transparent px-2 py-1 font-mono text-xs"
+              onFocus={(event) => event.currentTarget.select()}
+            />
+            <Button size="sm" variant="outline" onClick={() => void handleCopyShare()}>
+              复制
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setShareUrl("")}>
+              关闭
+            </Button>
+          </div>
+        )}
+
+        {exportMessage && (
+          <p
+            className={
+              exportStatus === "error"
+                ? "text-sm text-destructive"
+                : "text-sm text-muted-foreground"
+            }
+          >
+            {exportMessage}
+          </p>
+        )}
+        {/* 在线成员下拉面板（已结束房间不需要） */}
+        {!isEnded && showMembers && (
           <div className="rounded-lg border bg-card p-3 shadow-sm">
             <p className="mb-2 text-xs font-medium text-muted-foreground">
               在线成员 ({onlineMembers.length})
@@ -330,28 +469,32 @@ export default function RoomDetail() {
           </p>
         ) : room ? (
           <>
-            <PlayControls />
+            <PlayControls readOnly={readOnly} />
             <ResizablePanelGroup
               orientation="horizontal"
               className="h-[calc(100vh-240px)] min-h-[540px]"
             >
-              <ResizablePanel defaultSize="74%" minSize="45%">
+              <ResizablePanel defaultSize={readOnly ? "100%" : "74%"} minSize="45%">
                 <div className="flex h-full gap-4">
-                  <TrackList />
-                  <PianoRoll yjsActions={yjsActions} />
+                  <TrackList readOnly={readOnly} />
+                  <PianoRoll yjsActions={readOnly ? undefined : yjsActions} readOnly={readOnly} />
                 </div>
               </ResizablePanel>
-              <ResizableHandle />
-              <ResizablePanel
-                collapsible
-                collapsedSize="0%"
-                defaultSize="26%"
-                minSize="300px"
-                panelRef={aiPanelRef}
-                onResize={(size) => setAiCollapsed(size.asPercentage === 0)}
-              >
-                <AISidebar onCollapse={() => aiPanelRef.current?.collapse()} />
-              </ResizablePanel>
+              {!readOnly && (
+                <>
+                  <ResizableHandle />
+                  <ResizablePanel
+                    collapsible
+                    collapsedSize="0%"
+                    defaultSize="26%"
+                    minSize="300px"
+                    panelRef={aiPanelRef}
+                    onResize={(size) => setAiCollapsed(size.asPercentage === 0)}
+                  >
+                    <AISidebar onCollapse={() => aiPanelRef.current?.collapse()} />
+                  </ResizablePanel>
+                </>
+              )}
             </ResizablePanelGroup>
           </>
         ) : (

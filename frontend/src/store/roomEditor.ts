@@ -190,10 +190,15 @@ export const useRoomEditorStore = create<RoomEditorState>((set, get) => ({
       const room = await editorApi.getRoomDetail(roomId);
       // 保存 REST tracks 供 Yjs 初始化使用，但不直接设置到 store
       // tracks 由 Yjs 驱动，避免 REST 数据覆盖 Yjs 恢复的数据
+      // 已结束房间没有协同连接，直接用 REST 快照做只读回放
+      const isEnded = room.status === "ended";
       set({
         room,
         restTracks: room.tracks,
+        tracks: isEnded ? room.tracks : [],
+        selectedTrackId: isEnded ? room.tracks[0]?.id ?? null : null,
         loading: false,
+        bpm: room.bpm,
         past: [],
         future: [],
         playheadTicks: 0,

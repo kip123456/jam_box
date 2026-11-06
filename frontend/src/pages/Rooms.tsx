@@ -42,6 +42,9 @@ export default function Rooms() {
             <p className="mt-1 text-sm text-muted-foreground">加入一个公开房间，或创建自己的合奏房间。</p>
           </div>
           <div className="flex gap-2">
+            <Button variant="ghost" onClick={() => navigate("/history")}>
+              我的合奏
+            </Button>
             <Button variant="outline" onClick={() => setDialog("join")}>
               加入房间
             </Button>

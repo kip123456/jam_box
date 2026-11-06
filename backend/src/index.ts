@@ -12,6 +12,8 @@ import healthRouter from "./routes/health";
 import jobsRouter from "./routes/jobs";
 import authRouter from "./routes/auth";
 import roomsRouter from "./routes/rooms";
+import shareRouter, { publicShareRouter } from "./routes/share";
+import exportRouter from "./routes/export";
 import { roomTracksRouter, tracksRouter } from "./routes/tracks";
 import notesRouter from "./routes/notes";
 import aiRouter from "./routes/ai";
@@ -23,9 +25,15 @@ import { BusinessError } from "./lib/errors";
 import { setupSocketIO } from "./socket";
 import { flushAllPendingSaves } from "./lib/yjs";
 
+/** 导出文件目录（开发态 src/... 与构建产物 dist/... 均指向 backend/storage/exports） */
+const exportsDir = path.join(__dirname, "..", "storage", "exports");
+
 /** 组装 Express 应用（不监听端口，供测试与运行时复用） */
 export function createApp(): Express {
   const app = express();
+
+  // 启动时自动创建导出目录，避免首次导出失败
+  fs.mkdirSync(exportsDir, { recursive: true });
 
   // body parser
   app.use(express.json());
@@ -36,11 +44,26 @@ export function createApp(): Express {
   // 统一响应格式
   app.use(responseMiddleware);
 
+  // 导出文件静态访问（仅允许访问该目录，文件名做规范化）
+  app.use(
+    "/exports",
+    express.static(exportsDir, {
+      setHeaders: (res, filePath) => {
+        res.setHeader("Content-Disposition", `attachment; filename="${path.basename(filePath)}"`);
+      },
+    })
+  );
+
   // 路由
   app.use("/", healthRouter);
   app.use("/api/v1", healthRouter);
   app.use("/api/v1/jobs", jobsRouter);
   app.use("/api/v1/auth", authRouter);
+  // 分享：POST 房间分享需登录+成员，GET /shared/:token 公开
+  app.use("/api/v1", shareRouter);
+  app.use("/", publicShareRouter);
+  // 导出任务
+  app.use("/api/v1/rooms", exportRouter);
   app.use("/api/v1/rooms", roomsRouter);
   // 轨道/音符：先鉴权，再按房间（或轨道所属房间）校验成员身份
   app.use(

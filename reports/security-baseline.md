@@ -122,12 +122,12 @@ npm audit --omit=dev --json --registry=https://registry.npmjs.org
       "total": 3
     },
     "dependencies": {
-      "prod": 186,
+      "prod": 200,
       "dev": 74,
       "optional": 1,
       "peer": 0,
       "peerOptional": 0,
-      "total": 259
+      "total": 273
     }
   }
 }
