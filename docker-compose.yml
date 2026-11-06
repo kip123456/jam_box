@@ -3,12 +3,20 @@ services:
     build: ./backend
     ports:
       - "3000:3000"
+    volumes:
+      # SQLite 数据库持久化（命名卷首次挂载会复制镜像内 prisma 目录）
+      - jam_box_data:/app/prisma
+    environment:
+      - NODE_ENV=production
+      - BACKEND_PORT=3000
+      - DATABASE_URL=file:/app/prisma/dev.db
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
       interval: 30s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
     logging:
       driver: json-file
@@ -28,3 +36,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+volumes:
+  jam_box_data:
