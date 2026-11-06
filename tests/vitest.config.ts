@@ -17,6 +17,11 @@ export default defineConfig({
         find: /^jsonwebtoken$/,
         replacement: path.resolve(testDir, "../backend/node_modules/jsonwebtoken"),
       },
+      {
+        // 前端源码使用 "@/..." 路径别名，单测共用同一套 vite alias
+        find: /^@\/(.*)$/,
+        replacement: path.resolve(testDir, "../frontend/src/$1"),
+      },
     ],
   },
   test: {

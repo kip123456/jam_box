@@ -25,6 +25,13 @@ enum MemberRole {
   member
 }
 
+enum InstrumentType {
+  piano
+  guitar
+  bass
+  drums
+}
+
 model User {
   id           String   @id @default(cuid())
   username     String   @unique
@@ -35,6 +42,7 @@ model User {
 
   ownedRooms   Room[]       @relation("RoomOwner")
   roomMembers  RoomMember[]
+  tracks       Track[]
 }
 
 model Room {
@@ -50,6 +58,7 @@ model Room {
   updatedAt    DateTime   @updatedAt
 
   members      RoomMember[]
+  tracks       Track[]
 }
 
 model RoomMember {
@@ -80,4 +89,36 @@ model Job {
   updatedAt   DateTime  @updatedAt
 
   @@index([status])
+}
+
+model Track {
+  id             String         @id @default(cuid())
+  roomId         String
+  name           String
+  instrumentType InstrumentType
+  color          String         @default("#3b82f6")
+  solo           Boolean        @default(false)
+  mute           Boolean        @default(false)
+  position       Int
+  createdAt      DateTime       @default(now())
+  createdById    String?
+
+  room      Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  createdBy User?  @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  notes     Note[]
+
+  @@index([roomId])
+}
+
+model Note {
+  id             String @id @default(cuid())
+  trackId        String
+  pitch          Int
+  startTimeTicks Int
+  durationTicks  Int
+  velocity       Int    @default(100)
+
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([trackId])
 }

@@ -1,5 +1,6 @@
 import type { Room, RoomMember, User } from "@prisma/client";
 import prisma from "./prisma";
+import { trackInclude, type TrackWithNotes } from "./track";
 
 /** 房间号取值范围：100000-999999（避免前置零被截断，见 design 决策） */
 const ROOM_NUMBER_MIN = 100000;
@@ -28,6 +29,7 @@ type RoomOwner = Pick<User, "id" | "username">;
 type RoomWithRelations = Room & {
   owner?: RoomOwner | null;
   members?: (RoomMember & { user?: Pick<User, "id" | "username"> | null })[];
+  tracks?: TrackWithNotes[];
 };
 
 /** 房间对外序列化：移除 passwordHash，仅暴露必要字段 */
@@ -51,10 +53,11 @@ export function serializeRoom(room: RoomWithRelations) {
   };
 }
 
-/** 查询房间时统一携带的关系，保证 serializeRoom 可用 */
+/** 查询房间时统一携带的关系，保证 serializeRoom 可用；details 一并带上轨道与音符 */
 export const roomInclude = {
   owner: { select: { id: true, username: true } },
   members: { include: { user: { select: { id: true, username: true } } } },
+  tracks: { include: trackInclude, orderBy: { position: "asc" } },
 } as const;
 
 /** 按 id 或 6 位房间号解析房间（前端加入弹窗以房间号提交） */
