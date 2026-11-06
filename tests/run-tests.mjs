@@ -265,6 +265,303 @@ const CASES = [
     expected: "HTTP 204；access-control-allow-origin=http://localhost:5173；access-control-allow-methods 包含 POST",
   },
   {
+    id: "API-15",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "注册成功：返回用户信息、密码以 bcrypt cost 12 哈希落库且不回传哈希",
+    endpoint: "POST /api/v1/auth/register",
+    category: "正常",
+    precondition: "测试库已迁移且 User 表为空；body={username:'alice_01',password:'Passw0rd123',email:'alice@example.com'}",
+    action: "POST /api/v1/auth/register",
+    expected: "HTTP 200；code=0；data 含 id/username/email/createdAt 且无 passwordHash；User count=1；落库 passwordHash 前缀 $2、cost=12、不等于明文",
+  },
+  {
+    id: "API-16",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "重复用户名返回 409 且消息与 spec 一致",
+    endpoint: "POST /api/v1/auth/register",
+    category: "失败",
+    precondition: "同一用户名 alice_01 已注册；再次提交不同 email",
+    action: "POST /api/v1/auth/register",
+    expected: "HTTP 409；body={code:409,msg:'用户名已被占用',data:null}；User count 仍为 1",
+  },
+  {
+    id: "API-17",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "邮箱格式不正确返回 400",
+    endpoint: "POST /api/v1/auth/register",
+    category: "失败",
+    precondition: "body 中 email='not-an-email'",
+    action: "POST /api/v1/auth/register",
+    expected: "HTTP 400；code=400；msg='邮箱格式不正确'；data=null；User count=0",
+  },
+  {
+    id: "API-18",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "密码不含数字返回 400 且消息与 spec 一致",
+    endpoint: "POST /api/v1/auth/register",
+    category: "失败",
+    precondition: "body 中 password='OnlyLetters'",
+    action: "POST /api/v1/auth/register",
+    expected: "HTTP 400；msg='密码至少 8 位且需包含字母和数字'；User count=0",
+  },
+  {
+    id: "API-19",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "密码少于 8 位返回 400（边界）",
+    endpoint: "POST /api/v1/auth/register",
+    category: "边界",
+    precondition: "body 中 password='Ab1'（长度 3）",
+    action: "POST /api/v1/auth/register",
+    expected: "HTTP 400；msg='密码至少 8 位且需包含字母和数字'",
+  },
+  {
+    id: "API-20",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "用户名含非法字符返回 400",
+    endpoint: "POST /api/v1/auth/register",
+    category: "失败",
+    precondition: "body 中 username='bad name!'",
+    action: "POST /api/v1/auth/register",
+    expected: "HTTP 400；msg='用户名需为 3-32 位字母、数字或下划线'",
+  },
+  {
+    id: "API-21",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "用户名为 2 位返回 400（长度下边界）",
+    endpoint: "POST /api/v1/auth/register",
+    category: "边界",
+    precondition: "body 中 username='ab'（长度 2）",
+    action: "POST /api/v1/auth/register",
+    expected: "HTTP 400；msg='用户名需为 3-32 位字母、数字或下划线'",
+  },
+  {
+    id: "API-22",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "邮箱可省略，落库为 null（边界）",
+    endpoint: "POST /api/v1/auth/register",
+    category: "边界",
+    precondition: "body 不含 email 字段",
+    action: "POST /api/v1/auth/register",
+    expected: "HTTP 200；data.email=null；User 表中该用户 email=null",
+  },
+  {
+    id: "API-23",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "登录成功返回双令牌与用户信息，access 15min / refresh 7d",
+    endpoint: "POST /api/v1/auth/login",
+    category: "正常",
+    precondition: "已注册 alice_01；body={username:'alice_01',password:'Passw0rd123'}",
+    action: "POST /api/v1/auth/login",
+    expected: "HTTP 200；data 含 accessToken/refreshToken/user；access exp-iat=900；refresh exp-iat=604800",
+  },
+  {
+    id: "API-24",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "JWT payload 仅含 sub/type/iat/exp，不泄露 username 或 email",
+    endpoint: "POST /api/v1/auth/login",
+    category: "正常",
+    precondition: "已注册并登录成功",
+    action: "对 access/refresh token 做 jwt.decode",
+    expected: "两组 payload 的 key 都恰为 [exp,iat,sub,type]；type 分别为 access / refresh",
+  },
+  {
+    id: "API-25",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "用户名不存在返回 401 且不区分具体字段",
+    endpoint: "POST /api/v1/auth/login",
+    category: "失败",
+    precondition: "username='ghost_user' 不存在",
+    action: "POST /api/v1/auth/login",
+    expected: "HTTP 401；body={code:401,msg:'用户名或密码错误',data:null}",
+  },
+  {
+    id: "API-26",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "密码错误返回 401 且消息与用户名不存在一致",
+    endpoint: "POST /api/v1/auth/login",
+    category: "失败",
+    precondition: "已注册 alice_01；password='WrongPass123'",
+    action: "POST /api/v1/auth/login",
+    expected: "HTTP 401；body={code:401,msg:'用户名或密码错误',data:null}",
+  },
+  {
+    id: "API-27",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "缺少密码返回 400（边界）",
+    endpoint: "POST /api/v1/auth/login",
+    category: "边界",
+    precondition: "body 仅含 username",
+    action: "POST /api/v1/auth/login",
+    expected: "HTTP 400；msg='密码不能为空'",
+  },
+  {
+    id: "API-28",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "携带有效 access token 返回当前用户且不含 passwordHash",
+    endpoint: "GET /api/v1/auth/me",
+    category: "正常",
+    precondition: "已注册并登录，获取 access token",
+    action: "GET /api/v1/auth/me，Authorization: Bearer <access>",
+    expected: "HTTP 200；code=0；data 含 username/email/createdAt；无 passwordHash / password 字段",
+  },
+  {
+    id: "API-29",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "缺少 Authorization 返回 401 未登录",
+    endpoint: "GET /api/v1/auth/me",
+    category: "失败",
+    precondition: "请求不带 Authorization 头",
+    action: "GET /api/v1/auth/me",
+    expected: "HTTP 401；body={code:401,msg:'未登录',data:null}",
+  },
+  {
+    id: "API-30",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "Authorization 格式错误返回 401 未登录（边界）",
+    endpoint: "GET /api/v1/auth/me",
+    category: "边界",
+    precondition: "Authorization='Token <access>'（scheme 非 Bearer）",
+    action: "GET /api/v1/auth/me",
+    expected: "HTTP 401；msg='未登录'",
+  },
+  {
+    id: "API-31",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "签名无效的 access token 返回 401 令牌无效",
+    endpoint: "GET /api/v1/auth/me",
+    category: "失败",
+    precondition: "用 wrong-secret 伪造 access token",
+    action: "GET /api/v1/auth/me，Authorization: Bearer <forged>",
+    expected: "HTTP 401；body={code:401,msg:'令牌无效',data:null}",
+  },
+  {
+    id: "API-32",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "过期的 access token 返回 401 令牌已过期",
+    endpoint: "GET /api/v1/auth/me",
+    category: "失败",
+    precondition: "用正确密钥签发 exp 已过期的 access token",
+    action: "GET /api/v1/auth/me，Authorization: Bearer <expired>",
+    expected: "HTTP 401；body={code:401,msg:'令牌已过期',data:null}",
+  },
+  {
+    id: "API-33",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "用 refresh token 访问受保护接口返回 401 令牌无效（令牌类型隔离）",
+    endpoint: "GET /api/v1/auth/me",
+    category: "失败",
+    precondition: "登录取得 refresh token",
+    action: "GET /api/v1/auth/me，Authorization: Bearer <refresh>",
+    expected: "HTTP 401；msg='令牌无效'",
+  },
+  {
+    id: "API-34",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "合法签名但用户已不存在返回 401 未登录（依赖数据缺失）",
+    endpoint: "GET /api/v1/auth/me",
+    category: "失败",
+    precondition: "用正确密钥签发给不存在的用户 id",
+    action: "GET /api/v1/auth/me，Authorization: Bearer <orphan>",
+    expected: "HTTP 401；msg='未登录'",
+  },
+  {
+    id: "API-35",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "有效 refresh token 换发新双令牌，新 access token 可访问 me",
+    endpoint: "POST /api/v1/auth/refresh",
+    category: "正常",
+    precondition: "登录取得 refresh token；body={refreshToken:<refresh>}",
+    action: "POST /api/v1/auth/refresh；再用返回的 access 调 GET /me",
+    expected: "HTTP 200；data 含 accessToken/refreshToken；随后 GET /me 返回 HTTP 200 且 username='alice_01'",
+  },
+  {
+    id: "API-36",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "也支持通过 Authorization header 提交 refresh token（边界）",
+    endpoint: "POST /api/v1/auth/refresh",
+    category: "边界",
+    precondition: "Authorization: Bearer <refresh>，body={}",
+    action: "POST /api/v1/auth/refresh",
+    expected: "HTTP 200；data.accessToken 为非空字符串",
+  },
+  {
+    id: "API-37",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "用 access token 调用 refresh 返回 401 令牌无效",
+    endpoint: "POST /api/v1/auth/refresh",
+    category: "失败",
+    precondition: "body={refreshToken:<access>}",
+    action: "POST /api/v1/auth/refresh",
+    expected: "HTTP 401；msg='令牌无效'",
+  },
+  {
+    id: "API-38",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "签名无效的 refresh token 返回 401 令牌无效",
+    endpoint: "POST /api/v1/auth/refresh",
+    category: "失败",
+    precondition: "用 wrong-secret 伪造 refresh token",
+    action: "POST /api/v1/auth/refresh",
+    expected: "HTTP 401；msg='令牌无效'",
+  },
+  {
+    id: "API-39",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "过期的 refresh token 返回 401 令牌已过期",
+    endpoint: "POST /api/v1/auth/refresh",
+    category: "失败",
+    precondition: "用正确密钥签发 exp 已过期的 refresh token",
+    action: "POST /api/v1/auth/refresh",
+    expected: "HTTP 401；body={code:401,msg:'令牌已过期',data:null}",
+  },
+  {
+    id: "API-40",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "缺少 refreshToken 返回 401 未登录（边界）",
+    endpoint: "POST /api/v1/auth/refresh",
+    category: "边界",
+    precondition: "body={} 且无 Authorization 头",
+    action: "POST /api/v1/auth/refresh",
+    expected: "HTTP 401；body={code:401,msg:'未登录',data:null}",
+  },
+  {
+    id: "API-41",
+    level: "接口",
+    file: "tests/api/auth.test.ts",
+    title: "旧 access token 在有效期内仍可访问 me（无状态 JWT，不做黑名单）",
+    endpoint: "POST /api/v1/auth/refresh",
+    category: "边界",
+    precondition: "登录取得 access/refresh token；先用 refresh token 换发新令牌",
+    action: "刷新后仍用刷新前的旧 access token 调 GET /api/v1/auth/me",
+    expected: "refresh 返回 HTTP 200；旧 access token 调 me 返回 HTTP 200 且 username='alice_01'（与 design 无黑名单一致）",
+  },
+  {
     id: "UNIT-01",
     level: "单元",
     file: "tests/unit/response-middleware.test.ts",
@@ -528,6 +825,237 @@ const CASES = [
     action: "Promise.all([runJob(id), runJob(id)])",
     expected: "handler 调用次数=1；status='success'；result={ok:true}",
   },
+  {
+    id: "UNIT-25",
+    level: "单元",
+    file: "tests/unit/auth-lib.test.ts",
+    title: "hashPassword 生成 cost 12 的 bcrypt 哈希且可正确比对",
+    endpoint: "-",
+    category: "正常",
+    precondition: "明文 Passw0rd123",
+    action: "hashPassword('Passw0rd123')；comparePassword 正确/错误明文",
+    expected: "哈希以 $2 开头、cost=12、不含明文；正确明文返回 true",
+  },
+  {
+    id: "UNIT-26",
+    level: "单元",
+    file: "tests/unit/auth-lib.test.ts",
+    title: "明文不匹配时 comparePassword 返回 false",
+    endpoint: "-",
+    category: "失败",
+    precondition: "哈希由 Passw0rd123 生成",
+    action: "comparePassword('WrongPass123', hash)",
+    expected: "返回 false",
+  },
+  {
+    id: "UNIT-27",
+    level: "单元",
+    file: "tests/unit/auth-lib.test.ts",
+    title: "access token 的 payload 仅含 sub/type/iat/exp 且有效期 900 秒",
+    endpoint: "-",
+    category: "正常",
+    precondition: "sub='user-1'",
+    action: "signAccessToken('user-1') 后 decode",
+    expected: "sub='user-1'；type='access'；key 恰为 [exp,iat,sub,type]；exp-iat=900",
+  },
+  {
+    id: "UNIT-28",
+    level: "单元",
+    file: "tests/unit/auth-lib.test.ts",
+    title: "refresh token 的 type 为 refresh 且有效期 604800 秒",
+    endpoint: "-",
+    category: "正常",
+    precondition: "sub='user-1'",
+    action: "signRefreshToken('user-1') 后 decode",
+    expected: "sub='user-1'；type='refresh'；exp-iat=604800",
+  },
+  {
+    id: "UNIT-29",
+    level: "单元",
+    file: "tests/unit/auth-lib.test.ts",
+    title: "verifyToken 返回 sub 与 type",
+    endpoint: "-",
+    category: "正常",
+    precondition: "signAccessToken('test')",
+    action: "verifyToken(token)",
+    expected: "sub='test'；type='access'",
+  },
+  {
+    id: "UNIT-30",
+    level: "单元",
+    file: "tests/unit/auth-lib.test.ts",
+    title: "被篡改的 token 校验失败",
+    endpoint: "-",
+    category: "失败",
+    precondition: "合法 access token 末两位替换为 xx",
+    action: "verifyToken(tampered)",
+    expected: "抛 JsonWebTokenError",
+  },
+  {
+    id: "UNIT-31",
+    level: "单元",
+    file: "tests/unit/auth-lib.test.ts",
+    title: "过期 token 校验抛 TokenExpiredError",
+    endpoint: "-",
+    category: "边界",
+    precondition: "用 expiresIn=-1 签发 access token",
+    action: "verifyToken(expired)",
+    expected: "抛 TokenExpiredError",
+  },
+  {
+    id: "UNIT-32",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "合法输入通过并保留字段",
+    endpoint: "-",
+    category: "正常",
+    precondition: "input={username:'alice_01',password:'Passw0rd123',email:'alice@example.com'}",
+    action: "registerSchema.parse(input)",
+    expected: "三个字段值原样保留",
+  },
+  {
+    id: "UNIT-33",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "email 可省略（边界）",
+    endpoint: "-",
+    category: "边界",
+    precondition: "input 不含 email",
+    action: "registerSchema.parse(input)",
+    expected: "email=undefined",
+  },
+  {
+    id: "UNIT-34",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "用户名少于 3 位被拒绝",
+    endpoint: "-",
+    category: "失败",
+    precondition: "username='ab'",
+    action: "registerSchema.safeParse(input)",
+    expected: "success=false；message='用户名需为 3-32 位字母、数字或下划线'",
+  },
+  {
+    id: "UNIT-35",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "用户名超过 32 位被拒绝（边界）",
+    endpoint: "-",
+    category: "边界",
+    precondition: "username='a'.repeat(33)",
+    action: "registerSchema.safeParse(input)",
+    expected: "success=false",
+  },
+  {
+    id: "UNIT-36",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "用户名含非法字符被拒绝",
+    endpoint: "-",
+    category: "失败",
+    precondition: "username='bad name'",
+    action: "registerSchema.safeParse(input)",
+    expected: "success=false",
+  },
+  {
+    id: "UNIT-37",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "密码缺少数字被拒绝",
+    endpoint: "-",
+    category: "失败",
+    precondition: "password='OnlyLetters'",
+    action: "registerSchema.safeParse(input)",
+    expected: "success=false；message='密码至少 8 位且需包含字母和数字'",
+  },
+  {
+    id: "UNIT-38",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "密码缺少字母被拒绝",
+    endpoint: "-",
+    category: "失败",
+    precondition: "password='12345678'",
+    action: "registerSchema.safeParse(input)",
+    expected: "success=false",
+  },
+  {
+    id: "UNIT-39",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "密码少于 8 位被拒绝（边界）",
+    endpoint: "-",
+    category: "边界",
+    precondition: "password='Ab1'",
+    action: "registerSchema.safeParse(input)",
+    expected: "success=false",
+  },
+  {
+    id: "UNIT-40",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "非法邮箱被拒绝且消息与 spec 一致",
+    endpoint: "-",
+    category: "失败",
+    precondition: "email='bad-email'",
+    action: "registerSchema.safeParse(input)",
+    expected: "success=false；message='邮箱格式不正确'",
+  },
+  {
+    id: "UNIT-41",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "用户名与密码非空时通过",
+    endpoint: "-",
+    category: "正常",
+    precondition: "input={username:'alice_01',password:'Passw0rd123'}",
+    action: "loginSchema.parse(input)",
+    expected: "username='alice_01'",
+  },
+  {
+    id: "UNIT-42",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "空密码被拒绝（边界）",
+    endpoint: "-",
+    category: "边界",
+    precondition: "password=''",
+    action: "loginSchema.safeParse(input)",
+    expected: "success=false",
+  },
+  {
+    id: "UNIT-43",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "缺少用户名被拒绝",
+    endpoint: "-",
+    category: "失败",
+    precondition: "input 仅含 password",
+    action: "loginSchema.safeParse(input)",
+    expected: "success=false",
+  },
+  {
+    id: "UNIT-44",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "refreshToken 非空时通过",
+    endpoint: "-",
+    category: "正常",
+    precondition: "input={refreshToken:'token-value'}",
+    action: "refreshSchema.parse(input)",
+    expected: "refreshToken='token-value'",
+  },
+  {
+    id: "UNIT-45",
+    level: "单元",
+    file: "tests/unit/auth-validators.test.ts",
+    title: "空 refreshToken 被拒绝（边界）",
+    endpoint: "-",
+    category: "边界",
+    precondition: "refreshToken=''",
+    action: "refreshSchema.safeParse(input)",
+    expected: "success=false",
+  },
 ];
 
 const CASE_BY_TITLE = new Map(CASES.map((item) => [item.title, item]));
@@ -728,12 +1256,16 @@ function buildReports({
   precheck.push("| GET | /api/v1/hello | 无（公开） | 无入参 | 200 |");
   precheck.push("| POST | /api/v1/jobs | 无（当前 bootstrap 阶段无鉴权路由） | zod submitJobSchema | 200 / 400 |");
   precheck.push("| GET | /api/v1/jobs/:id | 无（当前 bootstrap 阶段无鉴权路由） | zod jobIdSchema | 200 / 404 |");
+  precheck.push("| POST | /api/v1/auth/register | 无（公开） | zod registerSchema | 200 / 400 / 409 |");
+  precheck.push("| POST | /api/v1/auth/login | 无（公开） | zod loginSchema | 200 / 400 / 401 |");
+  precheck.push("| POST | /api/v1/auth/refresh | 需 refresh token（body 或 Bearer） | zod refreshSchema + JWT type 校验 | 200 / 401 |");
+  precheck.push("| GET | /api/v1/auth/me | 需 access token（Bearer） | JWT 签名 / 有效期 / type 校验 | 200 / 401 |");
   precheck.push("| * | 未匹配路径 | 无 | - | 404 |");
   precheck.push("");
   precheck.push("## 身份与数据");
   precheck.push("");
-  precheck.push("- 身份：本阶段所有已实现接口均为公开接口，无登录态、无角色；AuthError → 401 的映射由单元用例 UNIT-06 单独覆盖，供后续接入鉴权中间件时复用。");
-  precheck.push("- 数据：测试仅写入独立 SQLite（backend/prisma/test.db），每个用例前清空 Job 表；不接触生产库、不使用真实密钥。");
+  precheck.push("- 身份：register/login 公开；GET /auth/me 要求 access token，POST /auth/refresh 要求 refresh token。缺失/格式错误 → 401 未登录，过期 → 401 令牌已过期，签名非法或 token 类型不匹配 → 401 令牌无效（API-29 ~ API-33、API-37 ~ API-39）。");
+  precheck.push("- 数据：测试仅写入独立 SQLite（backend/prisma/test.db），每个用例前清空 User / Job 表；口令只以 bcrypt cost 12 哈希落库且不回传（API-15），JWT payload 仅含 sub/type/iat/exp，不含用户名或邮箱（API-24）。");
   precheck.push(`- 接口级用例：${apiCases.length} 条（正常 / 失败 / 边界均已覆盖）；全部用例：${total} 条。`);
   precheck.push("");
   precheck.push("## 用例三段式记录");
@@ -751,6 +1283,9 @@ function buildReports({
   authz.push("| --- | --- | --- | --- |");
   authz.push("| GET /health、GET /api/v1/health、GET /api/v1/hello | 否（公开） | 无 Origin 或 http://localhost:5173 | API-01/02/03/04 |");
   authz.push("| POST /api/v1/jobs、GET /api/v1/jobs/:id | 否（bootstrap 阶段无鉴权路由） | 同上 | API-05 ~ API-14 |");
+  authz.push("| POST /api/v1/auth/register、POST /api/v1/auth/login | 否（公开） | 同上 | API-15 ~ API-27 |");
+  authz.push("| GET /api/v1/auth/me | 是（access token，type 必须为 access） | 同上 | API-28 ~ API-34 |");
+  authz.push("| POST /api/v1/auth/refresh | 是（refresh token，type 必须为 refresh） | 同上 | API-35 ~ API-40 |");
   authz.push("| 401 未认证映射 | 预留 | - | UNIT-06 |");
   authz.push("");
   authz.push("## 用例展开");
@@ -773,12 +1308,38 @@ function buildReports({
   authz.push("- 可观测结果与当前实际：期望 HTTP 204、ACAO=http://localhost:5173、allow-methods 含 POST；当前实际见 API-14 判定。");
   authz.push(`- 复测命令：${rerunCommand({ file: "tests/api/jobs.test.ts", title: "CORS 预检请求返回 204 并允许 POST" })}`);
   authz.push("");
+  authz.push("### AZ-04 受保护接口缺少凭据");
+  authz.push("- 前置条件：已注册 alice_01，但 GET /me 不带 Authorization 头");
+  authz.push("- 操作：GET /api/v1/auth/me");
+  authz.push("- 可观测结果与当前实际：期望 HTTP 401、body={code:401,msg:'未登录',data:null}；当前实际见 API-29（格式错误头见 API-30）。");
+  authz.push(`- 复测命令：${rerunCommand({ file: "tests/api/auth.test.ts", title: "缺少 Authorization 返回 401 未登录" })}`);
+  authz.push("");
+  authz.push("### AZ-05 令牌类型隔离（refresh 不能当 access 用）");
+  authz.push("- 前置条件：登录取得 refresh token，分别用于 GET /me 与 POST /refresh（access 反向使用）");
+  authz.push("- 操作：带 refresh token 访问 /me；带 access token 调用 /refresh");
+  authz.push("- 可观测结果与当前实际：期望两次都返回 HTTP 401、msg='令牌无效'；当前实际见 API-33 与 API-37。");
+  authz.push(`- 复测命令：${rerunCommand({ file: "tests/api/auth.test.ts", title: "用 refresh token 访问受保护接口返回 401 令牌无效（令牌类型隔离）" })}`);
+  authz.push("");
+  authz.push("### AZ-06 过期与伪造令牌");
+  authz.push("- 前置条件：用正确密钥签发 exp 已过期的 access token；用 wrong-secret 伪造 access token");
+  authz.push("- 操作：分别带两种 token 访问 GET /api/v1/auth/me");
+  authz.push("- 可观测结果与当前实际：过期 → HTTP 401 msg='令牌已过期'；伪造 → HTTP 401 msg='令牌无效'；当前实际见 API-31 与 API-32。");
+  authz.push(`- 复测命令：${rerunCommand({ file: "tests/api/auth.test.ts", title: "过期的 access token 返回 401 令牌已过期" })}`);
+  authz.push("");
   authz.push("## 结论");
   authz.push("");
-  const authzFail = results.filter(
-    (r) => ["GET /health 对未允许来源返回 CORS 错误（500 由中间件统一格式）", "AuthError 映射为 HTTP 401 / code 401", "CORS 预检请求返回 204 并允许 POST"].includes(r.title) && r.status !== "passed"
-  ).length;
-  authz.push(`- 权限相关用例 3 条，失败 ${authzFail} 条；当前所有公开接口无越权前提，受保护接口接入时需复用 UNIT-06 的 401 映射并补充角色用例。`);
+  const authzTitles = [
+    "GET /health 对未允许来源返回 CORS 错误（500 由中间件统一格式）",
+    "AuthError 映射为 HTTP 401 / code 401",
+    "CORS 预检请求返回 204 并允许 POST",
+    "缺少 Authorization 返回 401 未登录",
+    "用 refresh token 访问受保护接口返回 401 令牌无效（令牌类型隔离）",
+    "用 access token 调用 refresh 返回 401 令牌无效",
+    "签名无效的 access token 返回 401 令牌无效",
+    "过期的 access token 返回 401 令牌已过期",
+  ];
+  const authzFail = results.filter((r) => authzTitles.includes(r.title) && r.status !== "passed").length;
+  authz.push(`- 权限相关用例 8 条，失败 ${authzFail} 条；公开接口无越权前提，受保护接口已按“签名 + 有效期 + token 类型”三重校验，覆盖缺失、格式错误、过期、伪造与类型错配。`);
   writeReport(reportDir, "risk-authz.md", authz.join("\n"));
 
   // 3. risk-concurrency.md
@@ -820,9 +1381,21 @@ function buildReports({
   transaction.push("- 可观测结果与当前实际：期望最终 status='failed'、retryCount=3、error='boom'，不会同时出现 success；当前实际见 UNIT-23 判定。");
   transaction.push(`- 复测命令：${rerunCommand({ file: "tests/unit/worker.test.ts", title: "重试次数耗尽后标记最终 failed" })}`);
   transaction.push("");
+  transaction.push("## TX-04 注册校验失败不产生脏数据");
+  transaction.push("- 前置条件：User 表为空；body={username:'alice_01',password:'OnlyLetters'}。");
+  transaction.push("- 操作：POST /api/v1/auth/register。");
+  transaction.push("- 可观测结果与当前实际：期望 HTTP 400 且 User 表 count=0；当前实际见 API-18 判定。");
+  transaction.push(`- 复测命令：${rerunCommand({ file: "tests/api/auth.test.ts", title: "密码不含数字返回 400 且消息与 spec 一致" })}`);
+  transaction.push("");
+  transaction.push("## TX-05 重复注册不覆盖既有用户");
+  transaction.push("- 前置条件：alice_01 已存在；再次以同一用户名提交注册。");
+  transaction.push("- 操作：POST /api/v1/auth/register（唯一约束冲突）。");
+  transaction.push("- 可观测结果与当前实际：期望 HTTP 409、msg='用户名已被占用'，且 User 表 count 仍为 1（既有记录未被修改）；当前实际见 API-16 判定。");
+  transaction.push(`- 复测命令：${rerunCommand({ file: "tests/api/auth.test.ts", title: "重复用户名返回 409 且消息与 spec 一致" })}`);
+  transaction.push("");
   transaction.push("## 结论");
   transaction.push("");
-  transaction.push("- 当前数据模型为单表 Job，无跨表事务；本次以“落库条数 / 失败不落库 / 最终态唯一”三项作为一致性证据，均通过。");
+  transaction.push("- 当前数据模型为单表 Job 与 User，无跨表事务；本次以“落库条数 / 失败不落库 / 冲突不覆盖 / 最终态唯一”四项作为一致性证据，均通过。");
   writeReport(reportDir, "risk-transaction.md", transaction.join("\n"));
 
   // 5. security-baseline.md
@@ -908,8 +1481,9 @@ function buildReports({
   review.push("1. 全局错误中间件映射：BusinessError / AuthError / ZodError / Prisma P2002 / JSON 解析 / 依赖不可达。");
   review.push("2. 未匹配路由统一 404 JSON，避免 Express 默认 HTML 泄露路由信息。");
   review.push("3. 任务队列原子领取（`updateMany` 条件更新）与重试最终态。");
-  review.push("4. 测试数据库隔离：独立 `backend/prisma/test.db`，每轮重建、每用例清表。");
-  review.push("5. 敏感信息：仓库内是否存在硬编码密钥；.env 是否被忽略。");
+  review.push("4. 认证实现：bcrypt cost 12、JWT payload 最小化、access/refresh 类型隔离、401 静默刷新与并发刷新锁。");
+  review.push("5. 测试数据库隔离：独立 `backend/prisma/test.db`，每轮重建、每用例清表。");
+  review.push("6. 敏感信息：仓库内是否存在硬编码密钥；.env 是否被忽略；响应是否回传 passwordHash。");
   review.push("");
   review.push("## 判据");
   review.push("");
@@ -926,6 +1500,7 @@ function buildReports({
   review.push("  1. `express.json()` 解析非法 JSON 时原本落到 500，已改为 400 并补 API-09 / UNIT-09；");
   review.push("  2. 未匹配路由原本返回 Express 默认 404 HTML，已补统一 JSON 404 并补 API-12 / API-13；");
   review.push("  3. `worker.ts` 原先导入即启动，已用入口守卫 + 导出 `runJob` 使其可测，补 UNIT-21 ~ UNIT-24。");
+  review.push("  4. 认证中间件所需的 `Request.user` 类型扩展最初放在独立 .d.ts，ts-node-dev 运行时不加载导致编译失败，已改为在 `middleware/auth.ts` 内 `declare global`，补后端 tsc 通过验证。");
   review.push(`- 结论：${failed > 0 ? "存在失败用例，禁止合并，需修复后重跑。" : "全部用例通过，未留红。"}`);
   writeReport(reportDir, "review-01.md", review.join("\n"));
 

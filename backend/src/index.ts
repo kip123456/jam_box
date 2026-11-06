@@ -8,6 +8,7 @@ import { responseMiddleware } from "./middleware/response";
 import { errorMiddleware } from "./middleware/error";
 import healthRouter from "./routes/health";
 import jobsRouter from "./routes/jobs";
+import authRouter from "./routes/auth";
 import { config } from "./utils/env";
 import prisma from "./lib/prisma";
 import { BusinessError } from "./lib/errors";
@@ -29,6 +30,7 @@ export function createApp(): Express {
   app.use("/", healthRouter);
   app.use("/api/v1", healthRouter);
   app.use("/api/v1/jobs", jobsRouter);
+  app.use("/api/v1/auth", authRouter);
 
   // 未匹配路由统一返回 404 JSON，而非 Express 默认 HTML
   app.use((_req, _res, next) => {

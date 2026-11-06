@@ -12,6 +12,11 @@ export default defineConfig({
         find: /^@prisma\/client$/,
         replacement: path.resolve(testDir, "../backend/node_modules/@prisma/client"),
       },
+      {
+        // 根目录未安装 jsonwebtoken，用例复用 backend 的依赖签发测试令牌
+        find: /^jsonwebtoken$/,
+        replacement: path.resolve(testDir, "../backend/node_modules/jsonwebtoken"),
+      },
     ],
   },
   test: {
