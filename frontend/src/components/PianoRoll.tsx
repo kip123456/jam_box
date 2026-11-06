@@ -5,6 +5,7 @@ import {
   TICKS_PER_BEAT,
   useRoomEditorStore,
 } from "@/store/roomEditor";
+import { useCollabStore } from "@/store/collab";
 import { cn } from "@/lib/utils";
 
 /** 可见 MIDI 音高范围：A0 ~ C8（88 键） */
@@ -41,7 +42,17 @@ interface DragState {
   moved: boolean;
 }
 
-export function PianoRoll() {
+interface YjsActions {
+  addNote: (trackId: string, note: Omit<Note, "id" | "trackId">) => void;
+  updateNote: (trackId: string, noteId: string, updates: Partial<Note>) => void;
+  deleteNote: (trackId: string, noteId: string) => void;
+}
+
+interface PianoRollProps {
+  yjsActions?: YjsActions;
+}
+
+export function PianoRoll({ yjsActions }: PianoRollProps) {
   const tracks = useRoomEditorStore((state) => state.tracks);
   const selectedTrackId = useRoomEditorStore((state) => state.selectedTrackId);
   const playheadTicks = useRoomEditorStore((state) => state.playheadTicks);
@@ -49,6 +60,11 @@ export function PianoRoll() {
   const updateNotes = useRoomEditorStore((state) => state.updateNotes);
   const deleteNotes = useRoomEditorStore((state) => state.deleteNotes);
   const previewTracks = useRoomEditorStore((state) => state.previewTracks);
+
+  // 协同状态：已同步且已连接时使用 Yjs，否则回退到 REST
+  const yjsSynced = useCollabStore((s) => s.yjsSynced);
+  const connectionStatus = useCollabStore((s) => s.connectionStatus);
+  const useYjs = Boolean(yjsSynced && connectionStatus === "connected" && yjsActions);
 
   const track = tracks.find((item) => item.id === selectedTrackId) ?? null;
   // AI 预览：修复预览（带轨道 id）只在对应轨道选中时显示；编曲预览（新轨道）始终叠加显示
@@ -83,14 +99,19 @@ export function PianoRoll() {
       if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
       if (!selectedNoteId || !selectedTrackId) return;
       event.preventDefault();
-      void deleteNotes(selectedTrackId, [selectedNoteId])
-        .then(() => setSelectedNoteId(null))
-        .catch((err) => setError(err instanceof Error ? err.message : "删除音符失败"));
+      if (useYjs && yjsActions) {
+        yjsActions.deleteNote(selectedTrackId, selectedNoteId);
+        setSelectedNoteId(null);
+      } else {
+        void deleteNotes(selectedTrackId, [selectedNoteId])
+          .then(() => setSelectedNoteId(null))
+          .catch((err) => setError(err instanceof Error ? err.message : "删除音符失败"));
+      }
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedNoteId, selectedTrackId, deleteNotes]);
+  }, [selectedNoteId, selectedTrackId, deleteNotes, useYjs, yjsActions]);
 
   // 拖拽移动音符（pointermove 更新预览，pointerup 提交 bulk 更新）
   useEffect(() => {
@@ -125,9 +146,16 @@ export function PianoRoll() {
       if (state.pitch === state.origPitch && state.ticks === state.origTicks) return;
 
       setError("");
-      void updateNotes(selectedTrackId!, [
-        { id: state.id, pitch: state.pitch, startTimeTicks: state.ticks },
-      ]).catch((err) => setError(err instanceof Error ? err.message : "移动音符失败"));
+      if (useYjs && yjsActions) {
+        yjsActions.updateNote(selectedTrackId!, state.id, {
+          pitch: state.pitch,
+          startTimeTicks: state.ticks,
+        });
+      } else {
+        void updateNotes(selectedTrackId!, [
+          { id: state.id, pitch: state.pitch, startTimeTicks: state.ticks },
+        ]).catch((err) => setError(err instanceof Error ? err.message : "移动音符失败"));
+      }
     }
 
     window.addEventListener("pointermove", handleMove);
@@ -167,12 +195,21 @@ export function PianoRoll() {
       Math.round(x / PX_PER_TICK / TICKS_PER_BEAT) * TICKS_PER_BEAT;
 
     setError("");
-    void addNote(track.id, {
-      pitch,
-      startTimeTicks,
-      durationTicks: TICKS_PER_BEAT,
-      velocity: 100,
-    }).catch((err) => setError(err instanceof Error ? err.message : "添加音符失败"));
+    if (useYjs && yjsActions) {
+      yjsActions.addNote(track.id, {
+        pitch,
+        startTimeTicks,
+        durationTicks: TICKS_PER_BEAT,
+        velocity: 100,
+      });
+    } else {
+      void addNote(track.id, {
+        pitch,
+        startTimeTicks,
+        durationTicks: TICKS_PER_BEAT,
+        velocity: 100,
+      }).catch((err) => setError(err instanceof Error ? err.message : "添加音符失败"));
+    }
   }
 
   if (!track && !hasPreview) {

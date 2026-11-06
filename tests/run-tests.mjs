@@ -2156,7 +2156,7 @@ try {
   const commit = shortCommit();
   reportDir = reportDirOverride
     ? path.resolve(ROOT, reportDirOverride)
-    : path.join(ROOT, "reports", `${localDateString(finishedAt)}-${commit}`);
+    : path.join(ROOT, "reports");
   fs.mkdirSync(reportDir, { recursive: true });
 
   const results = flattenResults(report);
